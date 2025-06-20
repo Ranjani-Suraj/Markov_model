@@ -211,7 +211,7 @@ public class ET_tour{
     }
 
     public boolean link(char u, char v){
-
+        System.out.println("Linking " + u + " and " + v);
         return true;
     }
 
