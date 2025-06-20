@@ -89,7 +89,7 @@ public class ET_tour{
         edgemap.get(u).remove(v);
     }
 
-    void rereoot(Node u){
+    void reroot(Node u){
         btree.change_root(u);
         if(u.left == null){
             return;
@@ -187,7 +187,7 @@ public class ET_tour{
             return false; //edge does not exist
         }
         Node y = get_edge(v, u);
-        rereoot(x);
+        reroot(x);
         btree.change_root(y);
         while(y.parent != y){
             btree.rotate(x);
@@ -212,6 +212,31 @@ public class ET_tour{
 
     public boolean link(char u, char v){
         System.out.println("Linking " + u + " and " + v);
+        if(connected(u, v)){
+            return false; //they are already connected so no need to link
+        }
+        Node x = get_node(u);
+        Node y = get_node(v);
+        if(x != null)
+            reroot(x);
+        if(y != null)
+            reroot(y);
+        
+        Node utemp = btree.insert_node(x);
+        Node vtemp = btree.insert_node(y);
+        utemp.name = u;
+        vtemp.name = v;
+        add_node(u, utemp);
+        add_node(v, vtemp);
+        if(y == null){
+            y = vtemp;
+        }
+        btree.change_root(y);
+        utemp.right = y;
+        y.parent = utemp;
+        utemp.update();
+        add_edge(u, v, utemp);
+        add_edge(v, u, vtemp);
         return true;
     }
 
