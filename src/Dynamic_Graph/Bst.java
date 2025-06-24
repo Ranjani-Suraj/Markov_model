@@ -4,9 +4,9 @@ package Dynamic_Graph;
 public class Bst {
     //ArrayList<Node> current_tour;
 
-    void rotate_right(Node u){
+    static void rotate_right(Node u){
         Node par = u.parent;
-        Node gpar = par.parent;
+        Node gpar = par!=null? par.parent : null;
         Node rchild = u.right;
         u.parent = gpar;
         if(gpar != null){
@@ -24,11 +24,13 @@ public class Bst {
         par.update();
         u.update();
     }
-    void rotate_left(Node u){
+
+    static void rotate_left(Node u){
         Node par = u.parent;
-        Node gpar = par.parent;
+        Node gpar = par!=null? par.parent : null;
         Node lchild = u.left;
         u.parent = gpar;
+
         if(gpar != null){
             if(par == gpar.right)
                 gpar.right = u;
@@ -44,7 +46,8 @@ public class Bst {
         par.update();
         u.update();
     }
-    void rotate(Node u){
+
+    static void rotate(Node u){
         Node par = u.parent;
         if(par == null){
             return;
@@ -55,16 +58,21 @@ public class Bst {
         else
             rotate_left(u);
     }
-    public void change_root(Node u){     //making u the root
+
+    //since this is a splay bst, we need to change the root every time we access a node
+    //this is done by rotating the node to the root
+    public static void change_root(Node u){     //making u the root
+        if(u == null){
+            return; //u is null, nothing to do
+        }
         Node par = u.parent;
         if(par == null){
             return; //u is already the root
         }
         
-        Node gpar = par.parent;
         while(u.parent != null){
             par = u.parent;
-            gpar = par.parent;
+            Node gpar = par.parent;
             if(gpar == null){
                 rotate(u);
                 break;
@@ -79,48 +87,28 @@ public class Bst {
         }
     }
 
-
-    Node insert_node(Node u){       //inserting a new node
+    //splay u to root
+    //go to rightmost node and insert a new node
+    static Node insert_node(Node u){       //inserting a new node to parent u
         if(u == null){
-            return null;
+            return new Node('0'); //if u is null, we create a new node
         }
-        change_root(u);   //keeps it balanced
+        change_root(u);   //make u the root
         while(u.right!=null)
             u = u.right; //keep going down until you become the rightmost node
         Node newnode = new Node('0');
         newnode.parent = u;
         u.right = newnode;    //put the newnode as the right child of the rightmost node
         u.update();
-        change_root(newnode);       //make the newnode the root, so every time we insert, it becomes the root
+        change_root(newnode);       //make the newnode the root
         return newnode;
     }
+    //...huh
 
-    void delete_node(Node u){
-        change_root(u);
-        Node lchild = u.left;
-        Node rchild = u.right;
-        if(lchild == null && rchild == null){     // if there is only 1 node and we delete it
-             return;
-        }
-        if(lchild == null){
-            //only a right child exists
-            u.right.parent = null;
-            u.right = null;
-            u.update();
-        }
-        else if(rchild == null){
-            //only left child
-            u.left.parent = null;
-            u.left = null;
-            u.update();
-        }
-        else{
-
-        }
-
-    }
-
-    void remove_child_node(Node u){
+    //detatch a node from its parent
+    //this is used when we want to remove a node from the tree, 
+    //but keep its subtree
+    static void remove_child_node(Node u){
         Node par = u.parent;
         if(par == null){
             return;
@@ -135,7 +123,39 @@ public class Bst {
         par.update();
     }
 
-    Node leftmost(Node u){
+    //deletes u from the bst by splaying it to the root, 
+    //separating the resulting left and right children
+    //make the leftmost of the right subtree the new root and attach the left 
+    static void delete_node(Node u){
+        change_root(u);
+        Node lchild = u.left;
+        Node rchild = u.right;
+        if(lchild == null && rchild == null){     // if there is only 1 node and we delete it
+             return;
+        }
+        if(lchild == null){
+            //only a right child exists, so the remaining tree is j the right
+            remove_child_node(rchild); //detatch u from its parent
+        }
+        else if(rchild == null){
+            //only left child
+            remove_child_node(lchild); //detatch u from its parent
+        }
+        else{
+            //both children exist, so we put the left subtree at the bottom
+            //of the right subtree
+            remove_child_node(lchild); //detatch u from its parent
+            remove_child_node(rchild); //detatch u from its parent
+            Node front = leftmost(rchild); //make the leftmost of the right subtree the root
+            front.left = lchild; //connects the leftmost of the subtree to the leftmost at root
+            lchild.parent = front; //set the parent of the left child to the new root
+            front.update();
+        }
+
+    }
+    
+
+    static Node leftmost(Node u){
         change_root(u);
         while(u.left != null){
             u = u.left;
@@ -144,7 +164,7 @@ public class Bst {
         return u;
     }
 
-    Node rightmost(Node u){
+    static Node rightmost(Node u){
         change_root(u);
         while(u.right != null){
             u = u.right;
@@ -153,7 +173,8 @@ public class Bst {
         return u;
     }
 
-    Node next(Node u){
+    //returns inorder successor of u, splays the node to the root
+    static Node next(Node u){
         change_root(u);
         u = u.right;
         if(u == null)

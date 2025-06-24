@@ -1,14 +1,13 @@
 package Dynamic_Graph;
 
 public class Node{
-    public char name;
-    public Node left;
-    public Node right;
-    public Node parent;
+    public int name;
+    public Node left, right, parent;
     public int size_subtree;
     public int[] adjacent_nodes; //number of tree nodes in the tree[0] and non tree
     public int[] sum_adjacent_nodes; //sum of adjacent nodes in subtree
-    public Node(char name){
+    
+    public Node(int name){
         this.name = name;
         left = right = parent = null;
         adjacent_nodes = new int[2];
@@ -19,9 +18,9 @@ public class Node{
 
     }
 
-    public Node getParent() {
-        return parent;
-    }
+    // public Node getParent() {
+    //     return parent;
+    // }
 
     public void update(){
         size_subtree = 1;
