@@ -1,14 +1,14 @@
-import Dynamic_Graph.*;
-
+package Dynamic_Graph;
 //import java.lang.reflect.Array;
 import java.util.*;
 
 public class Connectivity {
-     ArrayList<Integer> vertices;
-     ArrayList<ET_tour> spf;
-     ArrayList<Map<Integer, ArrayList<Integer>>> adj;
-     ArrayList<Map<Integer, ArrayList<Integer>>> tree_adj;
-     Map<Integer, Map<Integer, ArrayList<Integer>>> edge_level;
+    ArrayList<Integer> vertices;
+    ArrayList<ET_tour> spf;
+    ArrayList<Map<Integer, Set<Integer>>> adj;
+    ArrayList<Map<Integer, Set<Integer>>> tree_adj;
+    Map<Integer, Map<Integer, Set<Integer>>> edge_level; //for node u node v, we store level of edge??? what 
+    Map<Integer, Set<Integer>> edges;
     //this is supposed to be unordered_map<pair<int, int>, multiset<int>, hash_pair> edge_level;
     //who knows if this is gonna work wtf is a hash pair even
     // struct hash_pair {
@@ -23,7 +23,7 @@ public class Connectivity {
 
     public Connectivity(){
         vertices = new ArrayList<>();
-        spf = new ArrayList<>();
+        spf = new ArrayList<>(); //et tours for eahc level
         adj = new ArrayList<>();
         tree_adj = new ArrayList<>();
         edge_level = new HashMap<>();
@@ -31,22 +31,23 @@ public class Connectivity {
         spf.add(new ET_tour());
         adj.add(new HashMap<>());
         tree_adj.add(new HashMap<>());
+        edges = new HashMap<>();
         //there are logn levels, so we can just. initialize all of them i guess?
-        int num_levels = (int)(Math.floor(Math.log(5)/Math.log(2)));
-        for(int i = 0; i <= num_levels; i++){
-            tree_adj.put(i, new ArrayList<>());
-        }
+        //int num_levels = (int)(Math.floor(Math.log(5)/Math.log(2)));
+        // for(int i = 0; i < n; i++){
+        //     tree_adj.add(new HashMap<>());
+        // }
     }
 
     public  void add_vertex(int u){
         vertices.add(u);
         spf.add(spf.size()-1, new ET_tour());
-        adj.add(adj.size()-1, new HashMap<Integer, ArrayList<Integer>>());
-        tree_adj.add(tree_adj.size()-1, new HashMap<Integer, ArrayList<Integer>>());
+        adj.add(adj.size()-1, new HashMap<Integer, Set<Integer>>());
+        tree_adj.add(tree_adj.size()-1, new HashMap<Integer, Set<Integer>>());
         System.out.println("Added vertex " + u);
     }
 
-     void add_edge_level(int u, int v, int level, boolean is_tree_edge){
+    void add_edge_level(int u, int v, int level, boolean is_tree_edge){
         if(u > v){
             int temp = u;
             u = v;
@@ -54,13 +55,19 @@ public class Connectivity {
         }
         System.out.println("Adding edge " + u + "-" + v + " at level " + level);
         edge_level.putIfAbsent(u, new HashMap<>());
-        edge_level.get(u).putIfAbsent(v, new ArrayList<>());
+        edge_level.get(u).putIfAbsent(v, new HashSet<>());
         edge_level.get(u).get(v).add(level);
         if(is_tree_edge){
+            tree_adj.get(level).putIfAbsent(u, new HashSet<>());
+            tree_adj.get(level).putIfAbsent(v, new HashSet<>());
+
             tree_adj.get(level).get(u).add(v);
             tree_adj.get(level).get(v).add(u);
         }
         else{
+            adj.get(level).putIfAbsent(u, new HashSet<>());
+            adj.get(level).putIfAbsent(v, new HashSet<>());
+
             adj.get(level).get(u).add(v);
             adj.get(level).get(v).add(u);
         }
@@ -74,20 +81,23 @@ public class Connectivity {
             u = v;
             v = temp;
         }
-        edge_level.putIfAbsent(u, new HashMap<>());
-        edge_level.get(u).putIfAbsent(v, new ArrayList<>());
-        edge_level.get(u).get(v).remove(level);
-        //ok see problem is this is a problem because level is index but im deleting entry chee
+        // edge_level.putIfAbsent(u, new HashMap<>());
+        // edge_level.get(u).putIfAbsent(v, new ArrayList<>());
+
+        edge_level.get(u).get(v).remove(level); //remove the edge from the set of edges of x level
+                //ok see problem is this is a problem because level is index but im deleting entry chee
         
         if(is_tree_edge){
-            tree_adj.get(level).get(u).remove(v);
+            
+            tree_adj.get(level).get(u).remove(v); //if itis a tree edge then we remove it from its level
             tree_adj.get(level).get(v).remove(u);
         }
         else{
+            System.out.println("Removing edge lelvel " + u + "-" + v + " at level " + level + " "+adj.get(level).get(u));
             adj.get(level).get(u).remove(v);
             adj.get(level).get(v).remove(u);
         }
-        spf.get(level).update_adjacent(u, -1, is_tree_edge);
+        spf.get(level).update_adjacent(u, -1, is_tree_edge); //reduce level of edge by 1
         spf.get(level).update_adjacent(v, -1, is_tree_edge);
     }
 
@@ -100,26 +110,49 @@ public class Connectivity {
         if(!edge_level.containsKey(u) || !edge_level.get(u).containsKey(v)){
             return -1; //edge does not exist
         }
+        int lev = -1;
+        if(edge_level.get(u).get(v).iterator().hasNext()){
+            lev = edge_level.get(u).get(v).iterator().next();
+            System.out.println("found level = "+lev);
+        }
 
-        return edge_level.get(u).get(v).get(0); //return the first level of the edge
+        return lev;//return the first level of the edge
     }
 
     public  boolean add_edge(int u, int v){
         if(!vertices.contains(u) || !vertices.contains(v)){
             return false; //one of the vertices does not exist
         }
+        if(has_edge(u, v)){
+            System.out.println("Edge " + u + "," + v + " already exists");
+            return true; //edge already exists
+        }
+        //if they are connected at the lowest level then they are connected at all levels
         if(!spf.get(0).connected(u, v)){
            //they are not already connected, so we add the edge
+           System.out.println("Adding edge " + u + "-" + v);
            spf.get(0).link(u, v);
            add_edge_level(u, v, 0, true);
         }
         else{
+            System.out.println("alr connected so j adding tree");
             add_edge_level(u, v, 0, false);
         }
+        edges.putIfAbsent(u, new HashSet<>());
+        edges.get(u).add(v);
+        edges.putIfAbsent(v, new HashSet<>());
+        edges.get(v).add(u);
         return true;
     }
 
+    public boolean has_edge(int u, int v){
+        if(!vertices.contains(u) || !vertices.contains(v)){
+            return false; //one of the vertices does not exist
+        }
+        //return adj.contains(u) && adj.get(u).(v);
 
+        return edges.get(u) != null && edges.get(u).contains(v);
+    }
 
     public boolean delete_edge(int u, int v){
         if(!vertices.contains(u) || !vertices.contains(v)){
@@ -129,8 +162,12 @@ public class Connectivity {
         if(level == -1){
             return false; //edge does not exist
         }
-        if(!spf.get(0).cut(u, v)){
+        //need to cut for all levels?
+        if(!spf.get(0).cut(u, v)){ //if cutting the edge results in false, then it failed to cut. we need to cut it at every level right
+            System.out.println("Failed to cut edge " + u + "-" + v );
             //it is not a tree edge, so we j remove it from adj 
+            edges.get(u).remove(v);
+            edges.get(v).remove(u);
             remove_edge_level(u, v, level, false);
             return true;
         }
@@ -148,7 +185,7 @@ public class Connectivity {
                     break; //no more adjacent nodes
                 }
                 while(!tree_adj.get(i).get(x).isEmpty()){
-                    int y = tree_adj.get(i).get(x).get(0);
+                    int y = tree_adj.get(i).get(x).iterator().next();
                     remove_edge_level(x, y, i, true);
                     add_edge_level(x, y, i+1, true);
                     spf.get(i+1).link(x, y);
@@ -160,8 +197,8 @@ public class Connectivity {
                 if(x == -1){
                     break;
                 }
-                while(!adj.get(i).get(x).isEmpty()){
-                    int y = adj.get(i).get(x).get(0);
+                while(adj.get(i).containsKey(x) &&  adj.get(i).get(x).isEmpty()){
+                    int y = adj.get(i).get(x).iterator().next();
                     if(spf.get(i).connected(y, v)){
                         for(int j = 0; j<=i; j++){
                             spf.get(j).link(x, y);

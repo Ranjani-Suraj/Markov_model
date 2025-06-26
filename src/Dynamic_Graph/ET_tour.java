@@ -3,6 +3,7 @@ package Dynamic_Graph;
 //import java.lang.reflect.Array;
 import java.util.*;
 
+//failing because sets are the devil what even is this code tbh
 
 
 //i really need to fix this cuz idk if the dictionary stuff is gonna hold up
@@ -24,7 +25,7 @@ public class ET_tour{
     public ET_tour(){
         NodeSet = new HashMap<>();
         IDtoNode = new HashMap<>();
-        edgemap = new Hashtable<>();
+        edgemap = new HashMap<>();
         btree = new Bst();
         adj_map = new HashMap<>();
         adj_map.put(true, new HashMap<>()); //tree edges
@@ -41,9 +42,12 @@ public class ET_tour{
     public Node get_edge(int u, int v){
         //ArrayList<Node> neighbours = NodeSet.get(u);
         //int[] edge = {u, v}; returns u
-        if (edgemap.get(u)!=null && edgemap.get(u).get(v) != null){
+        System.out.println("Getting edge " + u + "-" + v);
+        if (edgemap.get(u) !=null){
+            System.out.println("Getting edge " + u + "-" + v);
             return edgemap.get(u).get(v);
         }
+        System.out.println("Edge " + u + "-" + v + " does not exist 49.");
         return null;
     }
 
@@ -57,9 +61,9 @@ public class ET_tour{
             //nu.createIfAbsent();
             // adj_map.get(false).computeIfAbsent(u, k -> new HashMap<Integer, Integer>());
             // adj_map.get(true).computeIfAbsent(u, k -> new HashMap<Integer, Integer>());
-            nu.adjacent_nodes[0] = adj_map.get(false).getOrDefault(u, 0); //tree edges
+            nu.adjacent_nodes[1] = adj_map.get(true).getOrDefault(u, 0); //tree edges
             //so that is. no. adhacent nodes of u which we are..not in the tree
-            nu.adjacent_nodes[1] = adj_map.get(true).getOrDefault(u, 0); //non tree edges
+            nu.adjacent_nodes[0] = adj_map.get(false).getOrDefault(u, 0); //non tree edges
             NodeSet.computeIfAbsent(u, k -> new HashSet<>());
             System.out.println("adjacent nodes: " + nu.adjacent_nodes[0] + " " + nu.adjacent_nodes[1]);
         }
@@ -79,7 +83,7 @@ public class ET_tour{
     }
 
     void remove_node(int u, Node n){
-        int ntree = n.adjacent_nodes[0], nntree = n.adjacent_nodes[1];
+        int ntree = n.adjacent_nodes[1], nntree = n.adjacent_nodes[0];
         if(!IDtoNode.containsKey(u)){
             return; //node does not exist
         }
@@ -94,8 +98,8 @@ public class ET_tour{
             Node next = NodeSet.get(u).iterator().next(); //get the next node in the set
             IDtoNode.put(u, next);
             Bst.change_root(next);
-            next.adjacent_nodes[0] = ntree;
-            next.adjacent_nodes[1] = nntree;
+            next.adjacent_nodes[1] = ntree;
+            next.adjacent_nodes[0] = nntree;
             next.update();
         }
     }
@@ -176,15 +180,19 @@ public class ET_tour{
         return x.name;
     }
 
+    //if it is a tree edfe then we add the num adj vertices to the vertex
+    //splay root to u. change number of adjacent nodes - if we remove/add a treeedge then we update if not then same 
     public void update_adjacent(int u, int add_adj, boolean is_treeedge){
-        adj_map.get(is_treeedge).merge(u, add_adj, Integer::sum);
+
+        adj_map.get(is_treeedge).merge(u, add_adj, (oldValue, newValue) -> oldValue + newValue);  //if is_treeedge then we search in index 1 ieuvsh 8wfesc
 
         Node x = get_node(u);
         if(x == null){
             return;
         }
+
         Bst.change_root(x);
-        x.adjacent_nodes[is_treeedge? 1:0] += add_adj;
+        x.adjacent_nodes[is_treeedge? 1:0] += add_adj; //if tree edge then we put in adjajcent[1]
         x.update();
     }
 
@@ -194,10 +202,12 @@ public class ET_tour{
         System.out.println("Cutting " + u + " and " + v);
         if(!connected(u, v)){
             System.out.println("Nodes " + u + " and " + v + " are not connected.");
-            return false; //they are not connected so this actually makes no sense
+            return true; //they are not connected so this actually makes no sense
         }
+        //get edge is failing when we know that the edge DOES exist which makes no sense
         Node x = get_edge(u, v);
         if(x == null){
+            System.out.println("Edge " + u + "-" + v + " does not exist in the tree.");
             return false; //edge does not exist
         }
         Node y = get_edge(v, u);
@@ -208,7 +218,7 @@ public class ET_tour{
         }
         Bst.remove_child_node(x); //removes the edge from the tree
         Node next = Bst.next(y);
-        if(next != null){
+        if(next != null){ //if there is a next node, we need to update the edge
             int temp = next.name;
             Node t = Bst.rightmost(next);
             remove_edge(v, temp);
@@ -216,10 +226,12 @@ public class ET_tour{
         }
         remove_node(u, x);
         remove_node(v, y);
+
         remove_edge(u, v);
         remove_edge(v, u);
         Bst.delete_node(x);
         Bst.delete_node(y);
+        System.out.println("Cut complete.");
         return true;
 
     }
