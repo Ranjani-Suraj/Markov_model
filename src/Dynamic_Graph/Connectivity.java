@@ -57,6 +57,10 @@ public class Connectivity {
         edge_level.putIfAbsent(u, new HashMap<>());
         edge_level.get(u).putIfAbsent(v, new HashSet<>());
         edge_level.get(u).get(v).add(level);
+        edge_level.putIfAbsent(v, new HashMap<>());
+        edge_level.get(v).putIfAbsent(u, new HashSet<>());
+        edge_level.get(v).get(u).add(level);
+
         if(is_tree_edge){
             tree_adj.get(level).putIfAbsent(u, new HashSet<>());
             tree_adj.get(level).putIfAbsent(v, new HashSet<>());
@@ -85,6 +89,7 @@ public class Connectivity {
         // edge_level.get(u).putIfAbsent(v, new ArrayList<>());
 
         edge_level.get(u).get(v).remove(level); //remove the edge from the set of edges of x level
+        edge_level.get(v).get(u).remove(level); //remove the edge from the set of edges of y level
                 //ok see problem is this is a problem because level is index but im deleting entry chee
         
         if(is_tree_edge){
@@ -101,7 +106,7 @@ public class Connectivity {
         spf.get(level).update_adjacent(v, -1, is_tree_edge);
     }
 
-    int level(int u, int v){
+    public int level(int u, int v){
         if(u > v){
             int temp = u;
             u = v;
@@ -123,7 +128,11 @@ public class Connectivity {
         if(!vertices.contains(u) || !vertices.contains(v)){
             return false; //one of the vertices does not exist
         }
-        if(has_edge(u, v)){
+        if(v>u){
+            int t = u;
+            u = v; v = t;
+        }
+        if(has_edge(u, v) || has_edge(v, u)){
             System.out.println("Edge " + u + "," + v + " already exists");
             return true; //edge already exists
         }
@@ -133,6 +142,7 @@ public class Connectivity {
            System.out.println("Adding edge " + u + "-" + v);
            spf.get(0).link(u, v);
            add_edge_level(u, v, 0, true);
+           
         }
         else{
             System.out.println("alr connected so j adding tree");
@@ -164,42 +174,79 @@ public class Connectivity {
         }
         //need to cut for all levels?
         if(!spf.get(0).cut(u, v)){ //if cutting the edge results in false, then it failed to cut. we need to cut it at every level right
-            System.out.println("Failed to cut edge " + u + "-" + v );
+            System.out.println("non tree edge  " + u + "-" + v );
             //it is not a tree edge, so we j remove it from adj 
             edges.get(u).remove(v);
             edges.get(v).remove(u);
             remove_edge_level(u, v, level, false);
             return true;
         }
+        edges.get(u).remove(v);
+        edges.get(v).remove(u);
         remove_edge_level(u, v, level, true);
+        System.out.println("Cut succeeded now we search for a replacement");
+        
+        //for every level, 
         for(int i = level; i>=0; i--){
+            System.out.println("checking level "+ i);
             if(spf.get(i).size(u) > spf.get(i).size(v)){
-                //u is the root of the subtree, so we can just remove it
+                //make u the smaller subset
                 int temp = u;
                 u = v;
                 v = temp;
             }
+            //this isnt working 
+            //it is not able to find replacements that are not directly connected to u.
             while(true){
+
                 int x = spf.get(i).get_adjacent(u, true);
+                System.out.println("checking adj tree nodes of u: "+u+" x: "+x);
                 if(x == -1){
                     break; //no more adjacent nodes
                 }
-                while(!tree_adj.get(i).get(x).isEmpty()){
+                // if(tree_adj.get(i).get(x).isEmpty()){
+                //     System.out.println("no adjacent nodes at level "+i+" so we break");
+                //     // remove_edge_level(x, u, i, false);
+                //     // add_edge_level(x, u, i+1, false);
+                //     continue; //no more adjacent nodes
+                // }
+                //increase the level of every tree
+                while(!tree_adj.get(i).get(x).isEmpty()){ //adjacency list of tree nodes, so adjacent tree nodes to x at level i are increased level
+
                     int y = tree_adj.get(i).get(x).iterator().next();
+                    System.out.println("checked adj edge edges? y = "+y);
                     remove_edge_level(x, y, i, true);
                     add_edge_level(x, y, i+1, true);
-                    spf.get(i+1).link(x, y);
+                    spf.get(i+1).link(x, y); //link x and y at a higher level???? now that the edges exist just on a higher level??? on the ET tree???
                 }
+            
             }
+
             boolean flag = false;
             while(!flag){
+                
                 int x = spf.get(i).get_adjacent(u, false);
+                System.out.println("adjacent nodes at level "+i+" non tree: "+x);
                 if(x == -1){
                     break;
                 }
-                while(adj.get(i).containsKey(x) &&  adj.get(i).get(x).isEmpty()){
+                // if(!adj.get(i).containsKey(x)){
+                //     System.out.println("no adjacent nodes at level "+i+" so we break");
+                //     break; //no more adjacent nodes
+                // }
+                if(adj.get(i).get(x).isEmpty()){
+                    System.out.println("no adjacent nodes at level "+i+" so we break");
+                    // remove_edge_level(x, u, i, false);
+                    // add_edge_level(x, u, i+1, false);
+                    break; //no more adjacent nodes
+                }
+                while(!adj.get(i).get(x).isEmpty()){
+                    System.out.println("if there is a non tree edge at level "+i+" that is adjacent to u, ");
                     int y = adj.get(i).get(x).iterator().next();
+                    System.out.println("we check if the adjacent incident node y also connects to v: we check if x: "+x+
+                        "which is adjacent to a node in the cc of :"+u+" is also adjacent to a node in the cc of :"+v);
                     if(spf.get(i).connected(y, v)){
+                        
                         for(int j = 0; j<=i; j++){
                             spf.get(j).link(x, y);
                         }
@@ -220,6 +267,7 @@ public class Connectivity {
                 break;
             }
         }
+        //}
         return true;
     }
 

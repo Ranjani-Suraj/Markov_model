@@ -154,14 +154,14 @@ public class ET_tour{
         return x.size_subtree/2 + 1;
     }
 
-    //return number of neighbours
+    //return a of neighbour 
     public int get_adjacent(int u, boolean is_treeedge){
         Node x = get_node(u);
         if(x == null){ //the node is not used yet
-            return adj_map.get(is_treeedge).getOrDefault(u, 0)>0? u: -1;
+            return adj_map.get(is_treeedge).getOrDefault(u, 0)>0? u: -1; 
         }
         Bst.change_root(x);
-        if(x.sum_adjacent_nodes[(is_treeedge)? 1:0] <= 0){
+        if(x.sum_adjacent_nodes[(is_treeedge)? 1:0] <= 0){ //true  = 1, false = 0. and tree nodes are in sum[1]
             return -1;
         }
         //is this ... right?

@@ -1,6 +1,6 @@
 // Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
 // then press Enter. You can now see whitespace characters in your code.
-import Dynamic_Graph.*;
+//import Dynamic_Graph.*;
 import markov_funcs.CouplingPast;
 
 public class Main {
@@ -36,7 +36,10 @@ public class Main {
         // System.out.println("1 and 5 connected? " + con.connected(1, 5));
 
         int n = 5;
-        CouplingPast cp = new CouplingPast(100, n, 3/n, 1);
+        //x/5 = 0.05
+        //so x = 0.25
+        double p = 5.0/(double) n;
+        CouplingPast cp = new CouplingPast(5, n, 0.05, 2.0);
         cp.couple();
         
         //....it seems to work?
