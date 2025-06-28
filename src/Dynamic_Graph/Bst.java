@@ -88,7 +88,7 @@ public class Bst {
     }
 
     //splay u to root
-    //go to rightmost node and insert a new node
+    //go to rightmost node and insert a new node as a child of u, so in same tree
     static Node insert_node(Node u){       //inserting a new node to parent u
         if(u == null){
             return new Node('0'); //if u is null, we create a new node
@@ -142,8 +142,8 @@ public class Bst {
             remove_child_node(lchild); //detatch u from its parent
         }
         else{
-            //both children exist, so we put the left subtree at the bottom
-            //of the right subtree
+            //both children exist, so need to attach them
+            //so we put the left subtree at the bottom of the right subtree
             remove_child_node(lchild); //detatch u from its parent
             remove_child_node(rchild); //detatch u from its parent
             Node front = leftmost(rchild); //make the leftmost of the right subtree the root
@@ -173,7 +173,7 @@ public class Bst {
         return u;
     }
 
-    //returns inorder successor of u, splays the node to the root
+    //returns successor of u, splays the node to the root
     static Node next(Node u){
         change_root(u);
         u = u.right;

@@ -80,18 +80,19 @@ public class Connectivity {
     }
 
     void remove_edge_level(int u, int v, int level, boolean is_tree_edge){
-        if(u > v){
-            int temp = u;
-            u = v;
-            v = temp;
-        }
+        // if(u > v){
+        //     int temp = u;
+        //     u = v;
+        //     v = temp;
+        // }
+
         // edge_level.putIfAbsent(u, new HashMap<>());
         // edge_level.get(u).putIfAbsent(v, new ArrayList<>());
 
         edge_level.get(u).get(v).remove(level); //remove the edge from the set of edges of x level
         edge_level.get(v).get(u).remove(level); //remove the edge from the set of edges of y level
                 //ok see problem is this is a problem because level is index but im deleting entry chee
-        
+        System.out.println("Removing edge " + u + "-" + v + " at level " + level);
         if(is_tree_edge){
             
             tree_adj.get(level).get(u).remove(v); //if itis a tree edge then we remove it from its level
@@ -168,6 +169,10 @@ public class Connectivity {
         if(!vertices.contains(u) || !vertices.contains(v)){
             return false; //one of the vertices does not exist
         }
+        if(v>u){
+            int t = u;
+            u = v; v = t;
+        }
         int level = level(u, v);
         if(level == -1){
             return false; //edge does not exist
@@ -202,6 +207,7 @@ public class Connectivity {
                 int x = spf.get(i).get_adjacent(u, true);
                 System.out.println("checking adj tree nodes of u: "+u+" x: "+x);
                 if(x == -1){
+                    System.out.println("no adjacent nodes of "+u+" at level "+i+" so we break");
                     break; //no more adjacent nodes
                 }
                 // if(tree_adj.get(i).get(x).isEmpty()){
@@ -222,32 +228,30 @@ public class Connectivity {
             
             }
 
+            //non tree edges: getting adjacent nodes of u that are non tree edges to replace removed one
             boolean flag = false;
             while(!flag){
                 
                 int x = spf.get(i).get_adjacent(u, false);
-                System.out.println("adjacent nodes at level "+i+" non tree: "+x);
+                System.out.println("adjacent node at level "+i+" non tree: "+x);
                 if(x == -1){
                     break;
                 }
-                // if(!adj.get(i).containsKey(x)){
-                //     System.out.println("no adjacent nodes at level "+i+" so we break");
-                //     break; //no more adjacent nodes
-                // }
+
                 if(adj.get(i).get(x).isEmpty()){
-                    System.out.println("no adjacent nodes at level "+i+" so we break");
-                    // remove_edge_level(x, u, i, false);
-                    // add_edge_level(x, u, i+1, false);
+                    System.out.println("no adjacent nodes at level "+i+" ????");
+                    
                     break; //no more adjacent nodes
                 }
+
                 while(!adj.get(i).get(x).isEmpty()){
                     System.out.println("if there is a non tree edge at level "+i+" that is adjacent to u, ");
                     int y = adj.get(i).get(x).iterator().next();
-                    System.out.println("we check if the adjacent incident node y also connects to v: we check if x: "+x+
+                    System.out.println("we check if the adjacent incident node y: "+y+" also connects to v: we check if x: "+x+
                         "which is adjacent to a node in the cc of :"+u+" is also adjacent to a node in the cc of :"+v);
                     if(spf.get(i).connected(y, v)){
                         
-                        for(int j = 0; j<=i; j++){
+                        for(int j = 0; j<=i; j++){ //connect them in all levels lower than i
                             spf.get(j).link(x, y);
                         }
                         flag = true;
@@ -264,6 +268,7 @@ public class Connectivity {
             }
             if(flag){
                 //we found a replacement
+                System.out.println("Found a replacement for edge " + u + "-" + v + " at level " + i);
                 break;
             }
         }

@@ -4,7 +4,7 @@ public class Node{
     public int name;
     public Node left, right, parent;
     public int size_subtree;
-    public int[] adjacent_nodes; //number of tree nodes in the tree[0] and non tree
+    public int[] adjacent_nodes; //number of tree nodes in the tree[1] and non tree
     public int[] sum_adjacent_nodes; //sum of adjacent nodes in subtree
     
     public Node(int name){

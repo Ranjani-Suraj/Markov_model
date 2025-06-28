@@ -15,13 +15,13 @@ public class CouplingPast {
     double p, q, pi;
     int edges1, edges2; //number of edges in g1 and g2 respectively
     int iterations;
-    public CouplingPast(int epochs, int n, double p1, double q1) {
+    public CouplingPast(int epochs, int n, double p, double q) {
         this.epochs = epochs;
         this.n = n;
         this.g1 = new Connectivity();
         this.g2 = new Connectivity();
-        this.p = p1;
-        this.q = q1;
+        this.p = p;
+        this.q = q;
         this.pi = p/(p+q*(1-p));
         //make g1 a complete graph
         //make g2 an empty graph
@@ -181,6 +181,8 @@ public class CouplingPast {
             }
 
             if(cut_edge2){
+                System.out.println("cut edge for g2 "+edge[0]  + " " + edge[1]+ ", r = " + r + " pi = " + pi);
+
                 if(r <= pi){ //we add it if it is a cut edge w probability pi
                     if(!g2.has_edge(edge[0], edge[1])){
                         edges2++;
@@ -245,6 +247,18 @@ public class CouplingPast {
             }
             System.out.println("so far: "+iterations+"------------------------------");
 
+        }
+        for(int i = 1; i<=n; i++){
+            for(int j = i; j<=n; j++){
+                if(g1.has_edge(i, j)){
+                    System.out.println("G1 :"+ i+" " + j + " lvl: "+g1.level(i, j));
+                }
+                if(g2.has_edge(i, j)){
+                    System.out.println("G2 :" +i+" " + j + " lvl: "+g2.level(i, j));
+                }
+                
+
+            }
         }
         System.out.println("edges: "+edges1+" iterations: "+iterations);
 

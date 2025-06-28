@@ -39,7 +39,7 @@ public class Main {
         //x/5 = 0.05
         //so x = 0.25
         double p = 5.0/(double) n;
-        CouplingPast cp = new CouplingPast(5, n, 0.05, 2.0);
+        CouplingPast cp = new CouplingPast(5, n, 0.4, 2.0);
         cp.couple();
         
         //....it seems to work?

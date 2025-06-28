@@ -11,8 +11,9 @@ public class ET_tour{
     //need a map for IDtoNode, NodeSet,
     //edgemap, and adj_map
     Map<Integer, Node> IDtoNode;
-    Map<Integer, Set<Node>> NodeSet;
-    Map<Integer, Map<Integer, Node>> edgemap;//im dumb this is j tha adjacence list
+    Map<Integer, Set<Node>> NodeSet; //set of nodes (edges that node is in) for each node
+    Map<Integer, Map<Integer, Node>> edgemap;//maps (u, v) to node u
+    //so edgemap.get(u) returns a map of all adj v
     //it->second maps (u, v) it to node u
     Map<Boolean, Map<Integer, Integer>> adj_map;
 
@@ -32,7 +33,7 @@ public class ET_tour{
         adj_map.put(false, new HashMap<>()); //non tree edges
         
     }
-    public Node get_node(int u){ //returns IDtoNode[u] whatever that means
+    public Node get_node(int u){ //returns IDtoNode[u], so node version of u
         if(IDtoNode.isEmpty()){
             return null;
         }
@@ -44,8 +45,8 @@ public class ET_tour{
         //int[] edge = {u, v}; returns u
         System.out.println("Getting edge " + u + "-" + v);
         if (edgemap.get(u) !=null){
-            System.out.println("Getting edge " + u + "-" + v);
-            return edgemap.get(u).get(v);
+            //System.out.println("Getting edge " + u + "-" + v);
+            return edgemap.get(u).get(v); //will j return node u bro
         }
         System.out.println("Edge " + u + "-" + v + " does not exist 49.");
         return null;
@@ -72,6 +73,10 @@ public class ET_tour{
     }
 
     public void add_edge(int u, int v, Node n){
+        if(u>v){
+            int t = u;
+            u = v; v = t; //make sure u < v
+        }
         edgemap.computeIfAbsent(u, k -> new HashMap<>());
         edgemap.computeIfAbsent(v, k -> new HashMap<>());
         edgemap.get(u).put(v, n);
@@ -84,10 +89,11 @@ public class ET_tour{
 
     void remove_node(int u, Node n){
         int ntree = n.adjacent_nodes[1], nntree = n.adjacent_nodes[0];
+        
         if(!IDtoNode.containsKey(u)){
             return; //node does not exist
         }
-        if(!NodeSet.get(u).remove(n)){
+        if(!NodeSet.get(u).remove(n)){ 
             return;
         }
 
@@ -121,7 +127,10 @@ public class ET_tour{
         //why... are we doing this again
         u.parent = front;
         front.update();
+        // lchild.update();
         //at this point the root is the previous leftmost node, and u is the left child
+        //ok so 
+        //
         Bst.change_root(u);
         //this changes the root to u, so it only has a right subtree rooted at the previous leftmost
     }
@@ -156,24 +165,34 @@ public class ET_tour{
 
     //return a of neighbour 
     public int get_adjacent(int u, boolean is_treeedge){
+        System.out.println("Getting adjacent node for " + u + " with is_treeedge = " + is_treeedge);
         Node x = get_node(u);
         if(x == null){ //the node is not used yet
+            System.out.println("Node " + u + " does not exist??? so if u itself has adj then we return u else -1");
             return adj_map.get(is_treeedge).getOrDefault(u, 0)>0? u: -1; 
         }
         Bst.change_root(x);
+
         if(x.sum_adjacent_nodes[(is_treeedge)? 1:0] <= 0){ //true  = 1, false = 0. and tree nodes are in sum[1]
+            System.out.println("subtree " + u + " has no adjacent nodes: "+x.adjacent_nodes[is_treeedge? 1:0]);
             return -1;
         }
+        else{
+            System.out.println("subtree " + u + " has adjacent nodes: "+x.adjacent_nodes[is_treeedge? 1:0]);
+        }
         //is this ... right?
-        while(adj_map.get(is_treeedge).getOrDefault(x.name, -1) == 0){
+        //we search the subtree of x for a node that has an adjacent node of type is_treeedge
+        while(x!=null && adj_map.get(is_treeedge).get(x.name) <= 0){
+            System.out.println("Node " + x.name + " has no adjacent nodes so we look in subtree");
             Node lchild = x.left;
             Node rchild = x.right;
-            if(lchild != null && lchild.sum_adjacent_nodes[is_treeedge? 1:0] >0){
+            if(lchild != null && lchild.sum_adjacent_nodes[is_treeedge? 1:0] > 0){
                 x = lchild;
             }
             else if(rchild != null && rchild.sum_adjacent_nodes[is_treeedge? 1:0] > 0){
                 x = rchild;
             }
+ 
         }
 
         Bst.change_root(x);
@@ -298,17 +317,12 @@ public class ET_tour{
 
     public void print_tour(int u){
         Node root = get_node(u);
-        if(root == null){
-            System.out.println("Node " + u + " does not exist 290.");
-            return;
+       
+        while(root!=null){
+            System.out.print(root.name + " ");
+            root = Bst.next(root);
         }
-        Bst.change_root(root);
-        while(root.parent!=null){
-            root = root.parent; //go to the big time root of the tree
-        }
-        System.out.println("Tour for node " + u + ":");
-        preorder(root);
-        System.out.println();
+        System.out.println("^^ This is the tour of the tree rooted at " + u);
     }
 
     //now the actual ET Tree functions -> link, split, is connected, size, get adjacent, update adjacent
