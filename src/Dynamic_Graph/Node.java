@@ -36,7 +36,12 @@ public class Node{
             sum_adjacent_nodes[0] += right.sum_adjacent_nodes[0];
             sum_adjacent_nodes[1] += right.sum_adjacent_nodes[1];
         }
+        
     }
 
+    @Override
+    public String toString() {
+        return String.valueOf(name);
+    }
 
 }

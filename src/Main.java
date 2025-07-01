@@ -3,6 +3,11 @@
 //import Dynamic_Graph.*;
 import markov_funcs.CouplingPast;
 
+//import java.sql.Time;
+import java.util.*;
+
+
+
 public class Main {
     public static void main(String[] args) {
         // Press Alt+Enter with your caret at the highlighted text to see how
@@ -35,12 +40,13 @@ public class Main {
         // System.out.println("1 and 3 connected? " + con.connected(1, 3));
         // System.out.println("1 and 5 connected? " + con.connected(1, 5));
 
-        int n = 5;
+       
         //x/5 = 0.05
         //so x = 0.25
-        double p = 5.0/(double) n;
-        CouplingPast cp = new CouplingPast(5, n, 0.4, 2.0);
-        cp.couple();
+        //double p = 5.0/(double);
+
+        //CouplingPast cp = new CouplingPast(100, n, 0.02, 2.0);
+        // cp.couple();
         
         //....it seems to work?
         // et.cut(4, 1);
@@ -52,6 +58,29 @@ public class Main {
 
         //it...seems to work????
         //now lets test connectivity i guess?
+
+        System.out.println("Let us begin (battle music)");
+
+        Map<Double, ArrayList<double[]>> results = new HashMap<>();
+        long[] times = new long[100];
+        double[] p_choices = {0.001, 0.0012, 0.0013, 0.0014, 0.0015, 0.0016, 0.0017, 0.0018, 0.0019, 0.002, 0.0021, 0.0022, 0.0023, 0.0024, 0.0025, 0.0026, 0.0027, 0.0028, 0.0029};
+         int n = 50;
+        for(int i = 0; i < 100; i++){
+            int ch = Math.abs((int)(Math.random()*p_choices.length)-1);
+            System.out.println("n = "+n+", epochs = 100, p = "+p_choices[ch] + " q = 2");
+            CouplingPast cp = new CouplingPast(100, n, p_choices[ch]*10, 2);
+            long start = System.nanoTime();
+            double[] output = cp.couple();
+            long end = System.nanoTime();
+            times[i] = end-start;
+            results.putIfAbsent(p_choices[ch], new ArrayList<>());
+            results.get(p_choices[ch]).add(output);
+            System.out.println("Run "+i+"took "+times[i]+" milliseconds, "+output[1]+" iterations, and gave largest cc "+output[0]+" for p = "+p_choices[ch]);
+        }
+
+
+
+        
 
 
         System.out.printf("\nHello and welcome!");

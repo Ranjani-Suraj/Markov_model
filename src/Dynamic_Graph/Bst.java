@@ -32,10 +32,10 @@ public class Bst {
         u.parent = gpar;
 
         if(gpar != null){
-            if(par == gpar.right)
-                gpar.right = u;
-            else
+            if(par == gpar.left)
                 gpar.left = u;
+            else
+                gpar.right = u;
         }
         u.left = par;
         par.parent = u;
@@ -62,17 +62,16 @@ public class Bst {
     //since this is a splay bst, we need to change the root every time we access a node
     //this is done by rotating the node to the root
     public static void change_root(Node u){     //making u the root
+        // if(u == null){
+        //     return; //u is null, nothing to do
+        // }
         if(u == null){
-            return; //u is null, nothing to do
-        }
-        Node par = u.parent;
-        if(par == null){
             return; //u is already the root
         }
         
         while(u.parent != null){
-            par = u.parent;
-            Node gpar = par.parent;
+            Node par = u.parent, gpar;
+            gpar = par.parent;
             if(gpar == null){
                 rotate(u);
                 break;
@@ -85,6 +84,7 @@ public class Bst {
                 rotate(u);
             }   rotate(u);   
         }
+        //u.update();
     }
 
     //splay u to root
@@ -127,6 +127,9 @@ public class Bst {
     //separating the resulting left and right children
     //make the leftmost of the right subtree the new root and attach the left 
     static void delete_node(Node u){
+        // if(u == null){
+        //     return; //nothing to delete
+        // }
         change_root(u);
         Node lchild = u.left;
         Node rchild = u.right;
@@ -148,7 +151,7 @@ public class Bst {
             remove_child_node(rchild); //detatch u from its parent
             Node front = leftmost(rchild); //make the leftmost of the right subtree the root
             front.left = lchild; //connects the leftmost of the subtree to the leftmost at root
-            lchild.parent = front; //set the parent of the left child to the new root
+            //lchild.parent = front; //set the parent of the left child to the new root
             front.update();
         }
 
@@ -175,7 +178,10 @@ public class Bst {
 
     //returns successor of u, splays the node to the root
     static Node next(Node u){
+        if(u == null)
+            return null;
         change_root(u);
+        
         u = u.right;
         if(u == null)
             return null;
