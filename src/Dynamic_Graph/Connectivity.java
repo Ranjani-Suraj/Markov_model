@@ -186,6 +186,7 @@ public class Connectivity {
             //System.out.println("alr connected so j adding tree");
             add_edge_level(u, v, 0, false);
             add_edge_level(v, u, 0, false);
+            
             //System.out.println("edges at level 0: " + adj.get(0));
 
         }
@@ -243,6 +244,7 @@ public class Connectivity {
                 System.out.println("Tree edges: " + tree_adj.get(level));
                 System.out.println("Non tree edges: " + adj.get(level));
                 System.out.println("edges overall:"+edges);
+                System.out.println("edgemap:" + spf.get(0).edgemap);
                 spf.get(0).print_tour(u);
                 System.out.println("tree_Edge: "+tree_edge+", cut:  "+cut);
                 System.out.println(spf.get(0).edgemap);
@@ -402,7 +404,72 @@ public class Connectivity {
                 index = i;
             }
         }
+        System.out.println("largest comp: "+largest_component);
         spf.get(0).print_tour(index);
         return largest_component;
+    }
+
+    public int dfs(int source){
+        int n = edges.size();
+        ArrayList<Integer> stack = new ArrayList<>();
+        stack.add(source);
+        int max_size = 0;
+        Set<Integer> visited = new HashSet<>();
+        visited.add(source);
+        Set<Integer> unvisited = new HashSet<>();
+        for(int i = 1; i<=n; i++){
+            if(!visited.contains(i))
+                unvisited.add(i);
+        }
+        while(unvisited.size() > 0){
+            int start = unvisited.iterator().next();
+            unvisited.remove(start);
+            Map<Integer, Set<Integer>> newly = explore(start, max_size);
+            Set<Integer> vis = newly.get(newly.keySet().iterator().next());
+            visited.addAll(vis);
+            max_size = newly.keySet().iterator().next();
+            for(int i = 1; i<=n; i++){
+                if(!visited.contains(i))
+                    unvisited.add(i);
+                else if(!unvisited.contains(i))
+                    unvisited.remove(i);
+            }
+        }
+        //System.out.println("LARGEST COMP:"+max_size);
+        return max_size;
+    }
+
+    Map<Integer, Set<Integer>> explore(int start, Integer max_cc){
+        ArrayList<Integer> stack = new ArrayList<>();
+        stack.add(start);
+        Set<Integer> visited = new HashSet<>();
+        visited.add(start);
+        //int size = 0;
+        while (stack.size() > 0){
+            int v = stack.remove(stack.size()-1);
+            //System.out.println("adj of v:"+edges.get(v));
+            for(int u : edges.get(v)){
+                // System.out.println("u="+u);
+                // System.out.println("stack:"+stack);
+                // System.out.println("visited:"+visited);
+                if(!visited.contains(u)){
+                    visited.add(u);
+                    stack.add(u);
+                }
+
+                if(visited.size() == edges.size()){
+                    stack.clear();
+                    break;
+                }
+            }
+        }
+        // System.out.println("size: "+visited.size()+" for v: "+start);
+        // System.out.println("set: "+visited);
+        if(visited.size() > max_cc){
+            max_cc = (visited.size());
+        }
+        Map<Integer, Set<Integer>> result = new HashMap<>();
+        result.put(max_cc, visited);
+        return result;
     }
 }

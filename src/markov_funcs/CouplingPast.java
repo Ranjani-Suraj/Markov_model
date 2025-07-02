@@ -284,8 +284,8 @@ public class CouplingPast {
 
             }
         }
-        //System.out.println("edges: "+edges1+" iterations: "+iterations);
-        int largest_component = g1.max_cc();
+        System.out.println("edges: "+edges1+" "+edges2+" iterations: "+iterations);
+        int largest_component = g1.dfs(1);
         double[] result = {largest_component, iterations};
         return result;
     }

@@ -15,8 +15,7 @@ public class ET_tour{
     Map<Integer, Map<Integer, Node>> edgemap;//maps (u, v) to node u
     //so edgemap.get(u) returns a map of all adj v
     //it->second maps (u, v) it to node u
-    Map<Boolean, Map<Integer, Integer>> adj_map;
-
+    Map<Boolean, Map<Integer, Integer>> adj_map; //number of non tree edges and tree edges adjacentto u
     //adjacency list?
 
     Bst btree; //wait but we could have multiple trees because theyre not necessarily connected
@@ -57,7 +56,8 @@ public class ET_tour{
         //System.out.println("Adding node " + u);
 
         Bst.change_root(nu);
-        
+        NodeSet.putIfAbsent(u, new HashSet<>());
+        NodeSet.get(u).add(nu);
         if(!IDtoNode.containsKey(u)){ //it is not already in the tree
             IDtoNode.put(u, nu);
             //nu.createIfAbsent();
@@ -66,7 +66,7 @@ public class ET_tour{
             nu.adjacent_nodes[1] = adj_map.get(true).getOrDefault(u, 0); //tree edges
             //so that is. no. adhacent nodes of u which we are..not in the tree
             nu.adjacent_nodes[0] = adj_map.get(false).getOrDefault(u, 0); //non tree edges
-            NodeSet.putIfAbsent(u, new HashSet<>());
+            
             //System.out.println("adjacent nodes: " + nu.adjacent_nodes[0] + " " + nu.adjacent_nodes[1]);
         }
         nu.update();
@@ -151,7 +151,7 @@ public class ET_tour{
         Node x = get_node(u);
         Node y = get_node(v);
         if(x == null || y == null){
-            System.out.println("missing node 154");
+            //System.out.println("missing node 154");
             return false;
         }
         Bst.change_root(x);
@@ -257,18 +257,22 @@ public class ET_tour{
     public boolean cut(int u, int v){
         //System.out.println("Cutting " + u + " and " + v);
         if(!connected(u, v)){
-            System.out.println("Nodes " + u + " and " + v + " are not connected.");
+            
+            //System.out.println("Nodes " + u + " and " + v + " are not connected.");
+            //System.out.println(edgemap);
+
             return false; //they are not connected so it is not a tree edge
         }
         //get edge is failing when we know that the edge DOES exist which makes no sense
         Node x = get_edge(u, v);
         if(x == null){
-            System.out.println("Edge " + u + "-" + v + " does not exist in the tree 264. "+ get_edge(u, v));
+            //System.out.println("Edge " + u + "-" + v + " does not exist in the tree 264. "+ get_edge(u, v));
+            //System.out.println(edgemap);
             return false; //edge does not exist
         }
         Node y = get_edge(v, u);
         if(y == null){
-            System.out.println("y: Edge " + v + "-" + u + " does not exist in the tree 269.");
+            //System.out.println("y: Edge " + v + "-" + u + " does not exist in the tree 269.");
             return false; //edge does not exist
         }
         reroot(x);
