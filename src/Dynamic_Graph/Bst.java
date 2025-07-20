@@ -70,8 +70,7 @@ public class Bst {
         }
         
         while(u.parent != null){
-            Node par = u.parent, gpar;
-            gpar = par.parent;
+            Node par = u.parent, gpar = par.parent;
             if(gpar == null){
                 rotate(u);
                 break;
@@ -82,21 +81,23 @@ public class Bst {
             }
             else{                  //one left one right
                 rotate(u);
-            }   rotate(u);   
+                rotate(u);   
+            }
+            
         }
-        //u.update();
+        
     }
 
     //splay u to root
     //go to rightmost node and insert a new node as a child of u, so in same tree
-    static Node insert_node(Node u){       //inserting a new node to parent u
+    public static Node insert_node(Node u){       //inserting a new node to parent u
         if(u == null){
-            return new Node('0'); //if u is null, we create a new node
+            return new Node(0); //if u is null, we create a new node
         }
         change_root(u);   //make u the root
         while(u.right!=null)
             u = u.right; //keep going down until you become the rightmost node
-        Node newnode = new Node('0');
+        Node newnode = new Node(0);
         newnode.parent = u;
         u.right = newnode;    //put the newnode as the right child of the rightmost node
         u.update();
@@ -192,5 +193,13 @@ public class Bst {
         return u;
     }
 
+    public static void print_bst(Node u){
+        if (u == null){
+            return;
+        }
+        print_bst(u.left);
+        System.out.print(u.name + " ");
 
+        print_bst(u.right);
+    }
 }

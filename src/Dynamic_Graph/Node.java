@@ -27,17 +27,21 @@ public class Node{
         sum_adjacent_nodes[0] = adjacent_nodes[0];
         sum_adjacent_nodes[1] = adjacent_nodes[1];
         if(left != null){
+            // System.out.println("left subtree size: "+left.size_subtree);
+
             size_subtree += left.size_subtree;
             sum_adjacent_nodes[0] += left.sum_adjacent_nodes[0];
             sum_adjacent_nodes[1] += left.sum_adjacent_nodes[1];
         }
         if(right != null){
+            //System.out.println("right subtree size: "+right.size_subtree);
+
             size_subtree += right.size_subtree;
             sum_adjacent_nodes[0] += right.sum_adjacent_nodes[0];
             sum_adjacent_nodes[1] += right.sum_adjacent_nodes[1];
         }
-        
-    }
+        //System.out.println("size subtree: "+size_subtree+"\n"+sum_adjacent_nodes[1]);
+    }   
 
     @Override
     public String toString() {

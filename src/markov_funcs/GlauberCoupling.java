@@ -1,11 +1,16 @@
 package markov_funcs;
+//import java.util.ArrayList;
 
-import java.util.ArrayList;
+import java.util.*;
 
-import Dynamic_Graph.ConnGraph;
-import Dynamic_Graph.ConnVertex;
+import Dynamic_Graph.*;
 
-public class CouplingPast {
+
+public class GlauberCoupling {
+    //need to implement coupling form the past
+    //this takes a graph and basically, for some number of epochs, will randomly generate a bunch of numbers and edges and have you try coupling using them
+    //if you succeed, great. If not, you do another x epochs and again and again until you succeed
+    //so for this, lets just accept the number of epochs, 2 graphs, and try coupling them
     ConnGraph g1, g2;
     int n;
     int epochs;
@@ -13,7 +18,7 @@ public class CouplingPast {
     int edges1, edges2; //number of edges in g1 and g2 respectively
     int iterations;
     ArrayList<ConnVertex> vertices = new ArrayList<ConnVertex>();
-    public CouplingPast(int epochs, int n, double p, double q) {
+    public GlauberCoupling(int epochs, int n, double p, double q) {
         this.epochs = epochs;
         this.n = n;
         this.g1 = new ConnGraph(null);
@@ -41,6 +46,41 @@ public class CouplingPast {
         edges2 = 0; //empty graph has 0 edges
         iterations = 0;
     }
+
+
+    // void add_remove(boolean cut_edge, int[] edge, double r, Connectivity g){
+    //     if(cut_edge){
+    //         if(r <= pi){ //we add it if it is a cut edge w probability pi
+    //             if(g.has_edge(edge[0], edge[1])){
+    //                 edges1++;
+    //                 g.add_edge(edge[0], edge[1]); 
+
+    //                 System.out.println("added edge to  g1 "+edge[0]  + " " + edge[1]);
+    //             }
+    //             //dont need to mess with teh cc stuff since thats all handled
+    //         }
+    //         else{
+    //             //remove it 
+    //             if(g.has_edge(edge[0], edge[1])){
+    //                 g.delete_edge(edge[0], edge[1]);
+    //                 edges1--;
+    //             }
+    //         }
+    //     }
+    //     else if(r <= p){ //we still add it if its not a cut edge w prob p
+    //         if(g.has_edge(edge[0], edge[1])){
+    //             edges1++;
+    //             g.add_edge(edge[0], edge[1]);
+    //             System.out.println("added edge to g1 "+edge[0]  + " " + edge[1]);
+    //         }
+    //     }
+    //     else{ //we remove it
+    //         if(g.has_edge(edge[0], edge[1])){
+    //             g.delete_edge(edge[0], edge[1]);
+    //             edges1--;
+    //         }
+    //     }
+    // }
 
     public boolean run_epochs(){
         System.out.println("running epochs tada---------------------------------------------");

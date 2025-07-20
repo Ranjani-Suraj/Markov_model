@@ -3,9 +3,9 @@ package Dynamic_Graph;
 import java.util.*;
 
 public class Connectivity {
-    ArrayList<Integer> vertices;
+    Set<Integer> vertices;
     ArrayList<ET_tour> spf;
-    ArrayList<Map<Integer, Set<Integer>>> adj;
+    ArrayList<Map<Integer, Set<Integer>>> adj; //non tree edges at levels
     ArrayList<Map<Integer, Set<Integer>>> tree_adj;
     Map<Integer, Map<Integer, Set<Integer>>> edge_level; //for node u node v, we store level of edge??? what 
     Map<Integer, Set<Integer>> edges;
@@ -22,7 +22,7 @@ public class Connectivity {
     //what does this DO^^
 
     public Connectivity(){
-        vertices = new ArrayList<>();
+        vertices = new HashSet<>();
         spf = new ArrayList<>(); //et tours for eahc level
         adj = new ArrayList<>();
         tree_adj = new ArrayList<>();
@@ -58,9 +58,9 @@ public class Connectivity {
         edge_level.get(u).putIfAbsent(v, new HashSet<>());
         edge_level.get(u).get(v).add(level);
         
-        // edge_level.putIfAbsent(v, new HashMap<>());
-        // edge_level.get(v).putIfAbsent(u, new HashSet<>());
-        // edge_level.get(v).get(u).add(level);
+        edge_level.putIfAbsent(v, new HashMap<>());
+        edge_level.get(v).putIfAbsent(u, new HashSet<>());
+        edge_level.get(v).get(u).add(level);
 
         if(is_tree_edge){
             tree_adj.get(level).putIfAbsent(u, new HashSet<>());
@@ -77,15 +77,16 @@ public class Connectivity {
             adj.get(level).get(u).add(v);
             adj.get(level).get(v).add(u);
         }
+        System.out.println("At level "+level);
         spf.get(level).update_adjacent(u, 1, is_tree_edge);
         //spf.get(level).update_adjacent(v, 1, is_tree_edge);
         // //System.out.println("non tree adjacency list after adding edge: " + adj.get(level));
         // System.out.println("tree adjacency list after adding edge: " + tree_adj.get(level));
-        //System.out.println("At level "+level);
-        //System.out.println("Tree edges: " + tree_adj.get(level));
-        //System.out.println("Non tree edges: " + adj.get(level));
-        //System.out.println("Adding edge " + u + "-" + v + " at level " + level);
-        //spf.get(level).update_adjacent(v, 1, is_tree_edge);
+        // System.out.println("At level "+level);
+        // System.out.println("Tree edges: " + tree_adj.get(level));
+        // System.out.println("Non tree edges: " + adj.get(level));
+        // System.out.println("Adding edge " + u + "-" + v + " at level " + level);
+        spf.get(level).update_adjacent(v, 1, is_tree_edge);
     }
 
     void remove_edge_level(int u, int v, int level, boolean is_tree_edge){
@@ -95,9 +96,12 @@ public class Connectivity {
         //     v = temp;
         // }
 
-        edge_level.putIfAbsent(u, new HashMap<>());
-        edge_level.get(u).putIfAbsent(v, new HashSet<>());
+        // edge_level.putIfAbsent(u, new HashMap<>());
+        // edge_level.get(u).putIfAbsent(v, new HashSet<>());
         edge_level.get(u).get(v).remove(level); //remove the edge from the set of edges of x level
+        // edge_level.putIfAbsent(v, new HashMap<>());
+        // edge_level.get(v).putIfAbsent(u, new HashSet<>());
+        edge_level.get(v).get(u).remove(level);
         //edge_level.get(v).get(u).remove(level); //remove the edge from the set of edges of y level
                 //its sometimes taking tree edges as non tree edges
 
@@ -113,6 +117,7 @@ public class Connectivity {
                 
             // }
             tree_adj.get(level).get(u).remove(v);
+            tree_adj.get(level).get(v).remove(u);
         }
         else{
             //System.out.println("Removing edge lelvel " + u + "-" + v + " at level " + level + " "+adj.get(level) + " " + adj.get(level).get(u)); //+ " " + adj.get(level).containsKey(v));
@@ -133,10 +138,12 @@ public class Connectivity {
             // System.out.println("Non tree edges: " + adj.get(level));
             // System.out.println("Removing edge " + u + "-" + v + " at level " + level+" for tree edge = "+is_tree_edge);
             adj.get(level).get(u).remove(v);
+            adj.get(level).get(v).remove(u);
         }
+        System.out.println("At level "+level);
         spf.get(level).update_adjacent(u, -1, is_tree_edge); //reduce level of edge by 1
-        //spf.get(level).update_adjacent(v, -1, is_tree_edge);
-        //System.out.println("At level "+level);
+        spf.get(level).update_adjacent(v, -1, is_tree_edge);
+        
         //System.out.println("Tree edges: " + tree_adj.get(level));
         //System.out.println("Non tree edges: " + adj.get(level));
         //System.out.println("Removing edge " + u + "-" + v + " at level " + level);
@@ -175,17 +182,18 @@ public class Connectivity {
         //we add it at the lowest level
         if(!spf.get(0).connected(u, v)){
            //they are not already connected, so we add the edge
-           //System.out.println("Adding edge " + u + "-" + v);
+           System.out.println("Adding edge " + u + "-" + v);
            spf.get(0).link(u, v);
            //spf.get(0).link(v, u);
            add_edge_level(u, v, 0, true);
-           add_edge_level(v, u, 0, true);
-           //System.out.println("edges at level 0: " + adj.get(0));
+           //add_edge_level(v, u, 0, true);
+           System.out.println("tree edges at level 0:" + tree_adj.get(0));
+           System.out.println("non tree edges at level 0: " + adj.get(0));
         }
         else{
             //System.out.println("alr connected so j adding tree");
             add_edge_level(u, v, 0, false);
-            add_edge_level(v, u, 0, false);
+            //add_edge_level(v, u, 0, false);
             
             //System.out.println("edges at level 0: " + adj.get(0));
 
@@ -233,6 +241,15 @@ public class Connectivity {
         if(level == -1){
             return false; //edge does not exist
         }
+        System.out.println("edge: "+u+", "+v);
+                System.out.println("At level "+level);
+                System.out.println("Tree edges: " + tree_adj.get(level));
+                System.out.println("Non tree edges: " + adj.get(level));
+                System.out.println("edges overall:"+edges);
+                System.out.println("edgemap:" + spf.get(0).edgemap);
+                spf.get(0).print_tour(u);
+                //System.out.println("tree_Edge: "+tree_edge+", cut:  "+cut);
+                System.out.println(spf.get(0).edgemap);
         //need to cut for all levels?
 
         // boolean tree_edge = spf.get(0).cut(u, v);
@@ -260,12 +277,12 @@ public class Connectivity {
             edges.get(u).remove(v);
             edges.get(v).remove(u);
             remove_edge_level(u, v, level, false);
-            remove_edge_level(v, u, level, false);
+            //remove_edge_level(v, u, level, false);
 
             return true;
         }
         remove_edge_level(u, v, level, true);
-        remove_edge_level(v, u, level, true);
+        //remove_edge_level(v, u, level, true);
         
         
         edges.get(u).remove(v);
@@ -311,11 +328,12 @@ public class Connectivity {
                     int y = tree_adj.get(i).get(x).iterator().next();
                     //System.out.println("checked adj edge edges? y = "+y);
                     remove_edge_level(x, y, i, true);
-                    remove_edge_level(y, x, i, true);
+                    //remove_edge_level(y, x, i, true);
                     
                     add_edge_level(x, y, i+1, true);
-                    add_edge_level(y, x, i+1, true);
+                    //add_edge_level(y, x, i+1, true);
                     //
+                    System.out.println("linking "+x+" and "+y+" at level"+(i+1));
                     spf.get(i+1).link(x, y); //link x and y at a higher level???? now that the edges exist just on a higher level??? on the ET tree???
                     //System.out.println("linking "+x+" and "+y+" on a higher level");
                     //wait but it should still exist on level 0. so i should then. add it at level i+1? but... no? wtf 
@@ -324,6 +342,7 @@ public class Connectivity {
             }
 
             //its not able to find its own adjacent nodes what even
+            System.out.println("Searching for replacements:");
 
             //non tree edges: getting adjacent nodes of u that are non tree edges to replace removed one
             boolean flag = false;
@@ -356,19 +375,19 @@ public class Connectivity {
                         }
                         flag = true;
                         remove_edge_level(x, y, i, false);
-                        remove_edge_level(y, x, i, false);
+                        //remove_edge_level(y, x, i, false);
 
                         add_edge_level(x, y, i, true);
-                        add_edge_level(y, x, i, true);
+                        //add_edge_level(y, x, i, true);
 
                         break;
                     }
                     else{
                         remove_edge_level(x, y, i, false);
-                        remove_edge_level(y, x, i, false);
+                        //remove_edge_level(y, x, i, false);
                         
                         add_edge_level(y, x, i+1, false);
-                        add_edge_level(x, y, i+1, false);
+                        //add_edge_level(x, y, i+1, false);
                     }
                     
                 }
@@ -421,13 +440,21 @@ public class Connectivity {
             if(!visited.contains(i))
                 unvisited.add(i);
         }
+        Set <Integer> cc = new HashSet<>();
+        
         while(unvisited.size() > 0){
+            int ns = max_size;
             int start = unvisited.iterator().next();
             unvisited.remove(start);
             Map<Integer, Set<Integer>> newly = explore(start, max_size);
+
             Set<Integer> vis = newly.get(newly.keySet().iterator().next());
+            
             visited.addAll(vis);
             max_size = newly.keySet().iterator().next();
+            if(ns != max_size){
+                cc = vis;
+            }
             for(int i = 1; i<=n; i++){
                 if(!visited.contains(i))
                     unvisited.add(i);
@@ -435,7 +462,7 @@ public class Connectivity {
                     unvisited.remove(i);
             }
         }
-        //System.out.println("LARGEST COMP:"+max_size);
+        System.out.println("LARGEST COMP:"+cc);
         return max_size;
     }
 
