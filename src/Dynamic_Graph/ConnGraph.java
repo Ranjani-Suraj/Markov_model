@@ -571,7 +571,7 @@ public class ConnGraph {
      */
     public boolean addEdge(ConnVertex connVertex1, ConnVertex connVertex2) {
         if (connVertex1 == connVertex2) {
-            throw new IllegalArgumentException("Self-loops are not allowed");
+            return false;
         }
         if (vertexInfo.size() >= MAX_VERTEX_COUNT - 1) {
             throw new RuntimeException(
@@ -673,7 +673,7 @@ public class ConnGraph {
         }
         return maxSize/2 + 1;
     }
-    /**
+    /*
      * Pushes all level-i forest edges in the tree rooted at the specified node down to level i - 1, and adds them to
      * F_{i - 1}, where i is the level of the tree.
      */
@@ -829,7 +829,7 @@ public class ConnGraph {
                 }
 
                 if (replacementEdge != null) {
-                    System.out.println("found replacement:"+ replacementEdge.vertex1 + " -> " + replacementEdge.vertex2);
+                    //System.out.println("found replacement:"+ replacementEdge.vertex1 + " -> " + replacementEdge.vertex2);
                     return replacementEdge;
                 }
             }

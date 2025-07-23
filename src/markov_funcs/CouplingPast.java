@@ -1,7 +1,7 @@
 package markov_funcs;
 
 import java.util.ArrayList;
-
+import java.util.Random;
 import Dynamic_Graph.ConnGraph;
 import Dynamic_Graph.ConnVertex;
 
@@ -42,10 +42,36 @@ public class CouplingPast {
         iterations = 0;
     }
 
-    public boolean run_epochs(){
+    ArrayList<ArrayList<Integer>> generate_edges(){
+        Random random = new Random();
+        ArrayList<ArrayList<Integer>> edges = new ArrayList<>();
+        for(int i = 0; i<epochs; i++){
+            ArrayList<Integer> edge = new ArrayList<Integer>();
+            edge.add((int)(random.nextInt(n))); edge.add((int)(random.nextInt(n)));
+            if(edge.get(0) == edge.get(1)){
+                i--;
+                continue;
+            }
+            edges.add(edge);
+            
+        }
+        return edges;
+    }
+
+    ArrayList<Double> generate_r(){
+        Random random = new Random();
+        ArrayList<Double> probabilities = new ArrayList<>();
+        for(int i = 0; i<epochs; i++){
+            probabilities.add(random.nextDouble());
+        }
+        return probabilities;
+    }
+
+    public boolean run_epochs(ArrayList<ArrayList<Integer>> edges, ArrayList<Double> r_s){
         System.out.println("running epochs tada---------------------------------------------");
         int t = 0, i=0;
         //if r<pi and p then ig we def add for both, if r>p and pi then we def remove for both? i guess?
+        System.out.println("edges: "+edges+" rs"+r_s);
         for (i = 0; i<epochs; i++){
             double r = Math.random();
             if(edges1 == edges2){
@@ -55,17 +81,19 @@ public class CouplingPast {
                 return true;
             }
             
-            int[] edge = {(int)(Math.random() * n), (int)(Math.random() * n)};
+            ArrayList<Integer> _edge = edges.get(i);
+            int[] edge = new int[2];
+            edge[0] = _edge.get(0); edge[1] = _edge.get(1);
             if(edge[0] > edge[1]){
                 int tm = edge[0]; edge[0] = edge[1]; edge[1] = tm;
             }
             System.out.println("NEW EDGE TIME "+ edge[0] + " " + edge[1]);
             System.out.println("Current edges: g1: "+edges1+" g2: "+edges2);
             System.out.println("p: "+p+" q: "+q+" r: "+r+" pi: "+pi);
-            if(edge[0] == edge[1]){
-                i--;
-                continue; 
-            }
+            // if(edge[0] == edge[1]){
+            //     i--;
+            //     continue; 
+            // }
             t++;
             ConnVertex u = vertices.get(edge[0]);
             ConnVertex v = vertices.get(edge[1]);
@@ -215,41 +243,41 @@ public class CouplingPast {
 
     public double[] couple(){
         int num = 1;
+        ArrayList<Double> total_epoch_r = generate_r();
+        ArrayList<ArrayList<Integer>> total_edges = generate_edges();
         while(true){
         //for (int m = 0; m<num; m++){
             //just keep running until its true? i dont even need to generate anything it 
             //just generates right
-            boolean done = run_epochs();
+            
+            boolean done = run_epochs(total_edges, total_epoch_r);
             if(done)
                 break;
-            //need to find a way to print the graph so far
-            // for(int i = 1; i<=n; i++){
-            //     for(int j = i; j<=n; j++){
-            //         if(g1.has_edge(i, j)){
-            //             System.out.println("G1 :"+ i+" " + j + " lvl: "+g1.level(i, j));
-            //         }
-            //         if(g2.has_edge(i, j)){
-            //             System.out.println("G2 :" +i+" " + j + " lvl: "+g2.level(i, j));
-            //         }
-                    
-
-            //     }
-            // }
-            // System.out.println("so far: "+iterations+"------------------------------");
+            
+            epochs*=2;  
+            num*=2; //go 1, 2, 4, 8, ... 
+            //adding the new probabilities to the start of the existing ones, so were coupling from the past omg exciting
+            for(int i = 0; i<2; i++){
+                ArrayList<Double> add_r = generate_r();
+                ArrayList<ArrayList<Integer>> add_edges = generate_edges();
+                total_epoch_r.addAll(0, add_r);
+                total_edges.addAll(0, add_edges);
+            }
+            //System.out.println("so far: "+iterations+"------------------------------");
 
         }
-        for(int i = 1; i<=n; i++){
-            for(int j = i; j<=n; j++){
-                // if(g1.has_edge(i, j)){
-                //     //System.out.println("G1 :"+ i+" " + j + " lvl: "+g1.level(i, j));
-                // }
-                // if(g2.has_edge(i, j)){
-                //     //System.out.println("G2 :" +i+" " + j + " lvl: "+g2.level(i, j));
-                // }
+        // for(int i = 1; i<=n; i++){
+        //     for(int j = i; j<=n; j++){
+        //         // if(g1.has_edge(i, j)){
+        //         //     //System.out.println("G1 :"+ i+" " + j + " lvl: "+g1.level(i, j));
+        //         // }
+        //         // if(g2.has_edge(i, j)){
+        //         //     //System.out.println("G2 :" +i+" " + j + " lvl: "+g2.level(i, j));
+        //         // }
                 
 
-            }
-        }
+        //     }
+        // }
         System.out.println("edges: "+edges1+" "+edges2+" iterations: "+iterations);
 
         int largest_component = g1.max_comp_size();

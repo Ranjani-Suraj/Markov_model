@@ -10,6 +10,9 @@ public class ConnVertex {
         @Override
         protected Random initialValue() {
             return new Random();  //see, why am i doing this
+            //ok we;re getting a thread local random number generator so that we can use it to generate a random hash code for ConnVertex
+            //why do we need it to be thread local
+            //
             
         }
     };
