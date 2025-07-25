@@ -3,7 +3,7 @@ package markov_funcs;
 //import com.dyn_connect;
 import java.util.*;
 
-import Dynamic_Graph.*;
+import dyn_connectivity.*;
 
 
 public class GlauberCoupling {
@@ -11,7 +11,7 @@ public class GlauberCoupling {
     //this takes a graph and basically, for some number of epochs, will randomly generate a bunch of numbers and edges and have you try coupling using them
     //if you succeed, great. If not, you do another x epochs and again and again until you succeed
     //so for this, lets just accept the number of epochs, 2 graphs, and try coupling them
-    ConnGraph g1, g2;
+    ConnectGraph g1, g2;
     int n;
     int epochs;
     double p, q, pi;
@@ -21,15 +21,15 @@ public class GlauberCoupling {
     public GlauberCoupling(int epochs, int n, double p, double q) {
         this.epochs = epochs;
         this.n = n;
-        this.g1 = new ConnGraph(null);
-        this.g2 = new ConnGraph(null);
+        this.g1 = new ConnectGraph();
+        this.g2 = new ConnectGraph();
         this.p = p;
         this.q = q;
         this.pi = p/(p+q*(1-p));
         //make g1 a complete graph
         //make g2 an empty graph
         for (int i = 0; i<n; i++){
-            vertices.add(new ConnVertex());
+            vertices.add(new ConnVertex(i));
             //System.out.println("Added vertex " + i + "-> " + vertices.get(i));
             
         }

@@ -2,11 +2,12 @@ package markov_funcs;
 
 import java.util.ArrayList;
 import java.util.Random;
-import Dynamic_Graph.ConnGraph;
-import Dynamic_Graph.ConnVertex;
+// import Dynamic_Graph.ConnGraph;
+// import Dynamic_Graph.ConnVertex;
+import dyn_connectivity.*;
 
 public class CouplingPast {
-    ConnGraph g1, g2;
+    ConnectGraph g1, g2;
     int n;
     int epochs;
     int original_epochs;
@@ -20,8 +21,8 @@ public class CouplingPast {
         this.epochs = epochs;
         this.original_epochs = epochs;
         this.n = n;
-        this.g1 = new ConnGraph(null);
-        this.g2 = new ConnGraph(null);
+        this.g1 = new ConnectGraph();
+        this.g2 = new ConnectGraph();
         this.p = p;
         this.q = q;
         this.pi = p/(p+q*(1-p));
@@ -29,7 +30,7 @@ public class CouplingPast {
         //make g1 a complete graph
         //make g2 an empty graph
         for (int i = 0; i<n; i++){
-            vertices.add(new ConnVertex());
+            vertices.add(new ConnVertex(i));
             //System.out.println("Added vertex " + i + "-> " + vertices.get(i));
             
         }

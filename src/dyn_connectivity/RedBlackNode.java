@@ -1,5 +1,4 @@
-package Dynamic_Graph;
-
+package dyn_connectivity;
 
 import java.lang.ref.Reference;
 import java.lang.reflect.Array;
@@ -123,7 +122,7 @@ public abstract class RedBlackNode<N extends RedBlackNode<N>> implements Compara
     }
 
     /** Returns the first node in the subtree rooted at this node, if any. */
-    public N min() {
+    public N leftmost() {
         if (isLeaf()) {
             return null;
         }
@@ -136,7 +135,7 @@ public abstract class RedBlackNode<N extends RedBlackNode<N>> implements Compara
     }
 
     /** Returns the last node in the subtree rooted at this node, if any. */
-    public N max() {
+    public N rightmost() {
         if (isLeaf()) {
             return null;
         }
@@ -312,7 +311,7 @@ public abstract class RedBlackNode<N extends RedBlackNode<N>> implements Compara
         }
 
         if (node.parent == null) {
-            node.isRed = false; //if root
+            node.isRed = false;
         }
         if (changed) {
             for (node = node.parent; node != null; node = node.parent) {
@@ -866,14 +865,14 @@ public abstract class RedBlackNode<N extends RedBlackNode<N>> implements Compara
         if (parent != null || last.parent != null) {
             throw new IllegalArgumentException("The node is not the root of a tree");
         }
-        if (isLeaf()) { //if either this or last is empty, just return the other
+        if (isLeaf()) {
             return last;
         } else if (last.isLeaf()) {
             @SuppressWarnings("unchecked")
             N nThis = (N)this;
             return nThis;
-        } else { //if both are nonempty, remove the leftmost of last and use it as the pivot
-            N node = last.min();
+        } else {
+            N node = last.leftmost();
             last = node.remove();
             return concatenate(last, node);
         }
@@ -927,7 +926,7 @@ public abstract class RedBlackNode<N extends RedBlackNode<N>> implements Compara
                 firstBlackHeight++;
             }
 
-            lastRoot = splitNode.max().right;
+            lastRoot = splitNode.rightmost().right;
             lastBlackHeight = 0;
         } else {
             // Note that this branch is not needed for correctness, but it improves performance
@@ -972,7 +971,7 @@ public abstract class RedBlackNode<N extends RedBlackNode<N>> implements Compara
                 }
                 pivot.parent = null;
                 pivot.right = firstRoot;
-                // Already true: pivot.left == concatengateRoot, concatenateRoot.parent == pivot, !pivot.isRed
+                // Already true: pivot.left == concatenateRoot, concatenateRoot.parent == pivot, !pivot.isRed
                 if (!firstRoot.isLeaf()) {
                     firstRoot.parent = pivot;
                 }
@@ -984,7 +983,7 @@ public abstract class RedBlackNode<N extends RedBlackNode<N>> implements Compara
                 if (lastBlackHeight > concatenateBlackHeight) {
                     // The children of lastRoot are black per the loop invariant
                     lastRoot.isRed = true;
-                } 
+                }
                 pivot.parent = null;
                 pivot.left = lastRoot;
                 // Already true: pivot.right == concatenateRoot, concatenateRoot.parent == pivot, !pivot.isRed
@@ -1322,3 +1321,4 @@ public abstract class RedBlackNode<N extends RedBlackNode<N>> implements Compara
         assertOrderIsValid(comparator, null, null);
     }
 }
+
