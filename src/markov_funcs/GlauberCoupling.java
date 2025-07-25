@@ -1,6 +1,6 @@
 package markov_funcs;
 //import java.util.ArrayList;
-
+//import com.dyn_connect;
 import java.util.*;
 
 import Dynamic_Graph.*;
@@ -292,7 +292,7 @@ public class GlauberCoupling {
 
             }
         }
-        //System.out.println("edges: "+edges1+" "+edges2+" iterations: "+iterations);
+        System.out.println("edges: "+edges1+" "+edges2+" iterations: "+iterations);
 
         int largest_component = g1.max_comp_size();
         // int size_res  = g1.max_cc();

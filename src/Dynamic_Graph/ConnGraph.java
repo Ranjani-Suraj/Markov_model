@@ -534,7 +534,7 @@ public class ConnGraph {
             secondNode = edge.visit1;
         }
 
-        EulerTourNode secondNodeSuccessor = secondNode.successor();
+        EulerTourNode secondNodeSuccessor = secondNode.successor(); 
         if (firstNode.vertex.arbitraryVisit == firstNode) {
             EulerTourNode successor = secondNodeSuccessor;
             firstNode.vertex.arbitraryVisit = successor;
@@ -651,15 +651,15 @@ public class ConnGraph {
         return lowerVertex;
     }
 
-    public int comp_size(ConnVertex connVertex) {
-        //assertIsAugmented();
-        VertexInfo info = vertexInfo.get(connVertex);
-        if (info == null) {
-            return 0;
-        }
-        EulerTourNode root = info.vertex.arbitraryVisit.root();
-        return root.size;
-    }
+    // private int comp_size(ConnVertex connVertex) {
+    //     //assertIsAugmented();
+    //     VertexInfo info = vertexInfo.get(connVertex);
+    //     if (info == null) {
+    //         return 0;
+    //     }
+    //     EulerTourNode root = info.vertex.arbitraryVisit.root();
+    //     return root.size;
+    // }
 
     public int max_comp_size() {
         //assertIsAugmented();
