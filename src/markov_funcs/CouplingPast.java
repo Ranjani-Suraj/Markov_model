@@ -2,12 +2,14 @@ package markov_funcs;
 
 import java.util.ArrayList;
 import java.util.Random;
-// import Dynamic_Graph.ConnGraph;
-// import Dynamic_Graph.ConnVertex;
-import dyn_connectivity.*;
+import Dynamic_Graph.ConnGraph;
+import Dynamic_Graph.ConnVertex;
+//import dyn_connectivity.*;
+
+
 
 public class CouplingPast {
-    ConnectGraph g1, g2;
+    ConnGraph g1, g2;
     int n;
     int epochs;
     int original_epochs;
@@ -16,13 +18,16 @@ public class CouplingPast {
     int edges1, edges2; //number of edges in g1 and g2 respectively
     int iterations;
     ArrayList<Integer> seeds;
+    double add_time = 0.0;
+    double del_time = 0.0;
+    double conn_time = 0.0;
     ArrayList<ConnVertex> vertices = new ArrayList<ConnVertex>();
     public CouplingPast(int epochs, int n, double p, double q) {
         this.epochs = epochs;
         this.original_epochs = epochs;
         this.n = n;
-        this.g1 = new ConnectGraph();
-        this.g2 = new ConnectGraph();
+        this.g1 = new ConnGraph();
+        this.g2 = new ConnGraph();
         this.p = p;
         this.q = q;
         this.pi = p/(p+q*(1-p));
@@ -30,7 +35,7 @@ public class CouplingPast {
         //make g1 a complete graph
         //make g2 an empty graph
         for (int i = 0; i<n; i++){
-            vertices.add(new ConnVertex(i));
+            vertices.add(new ConnVertex());
             //System.out.println("Added vertex " + i + "-> " + vertices.get(i));
             
         }
@@ -38,9 +43,11 @@ public class CouplingPast {
         for(int i = 0; i<n; i++){
             for(int j = 0; j<n; j++){
                 ////System.out.println("ADD EDGE: "+j);
-                if(i!=j)
+                if(i!=j){
+                    double start = System.nanoTime();
                     g1.addEdge(vertices.get(i), vertices.get(j));
-
+                    add_time += (System.nanoTime() - start);
+                }
             }
         }
         edges1 = n * (n - 1) / 2; //complete graph has n(n-1)/2 edges
@@ -110,9 +117,9 @@ public class CouplingPast {
             //ArrayList<Integer> _edge = edges.get(i);
             int[] edge = {random.nextInt(n), random.nextInt(n)};
             //edge[0] = _edge.get(0); edge[1] = _edge.get(1);
-            if(edge[0] > edge[1]){
-                int tm = edge[0]; edge[0] = edge[1]; edge[1] = tm;
-            }
+            // if(edge[0] > edge[1]){
+            //     int tm = edge[0]; edge[0] = edge[1]; edge[1] = tm;
+            // }
             //System.out.println("NEW EDGE TIME "+ edge[0] + " " + edge[1]);
             //System.out.println("Current edges: g1: "+edges1+" g2: "+edges2);
             //System.out.println("p: "+p+" q: "+q+" r: "+r+" pi: "+pi);
@@ -153,7 +160,9 @@ public class CouplingPast {
                 }
                 if(replace1){
                     //System.out.println("adding edge back to g1 "+edge[0]  + " " + edge[1]);
+                    double start = System.nanoTime();
                     g1.addEdge(u, v); //add it back
+                    add_time += (System.nanoTime() - start);
                 }
             }
             else if (replace1){
@@ -181,8 +190,11 @@ public class CouplingPast {
                 //System.out.println("edge is a cut edge for g2");
                 cut_edge2 = true;
             }
-            if(replace2)
+            if(replace2){
+                double start = System.nanoTime();
                 g2.addEdge(u, v); //add it back
+                add_time += (System.nanoTime() - start);
+            }
 
             ////System.out.println("starting to add/delete!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
             //need to do the markov stuff lol i forgor

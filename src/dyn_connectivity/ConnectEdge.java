@@ -25,7 +25,7 @@ public class ConnectEdge {
     public ConnectEdge(EulerTourVertex u, EulerTourVertex v) {
         this.u = u;
         this.v = v;
-        this.e = e;
+        this.e = null;
         this.prev_u = null; // initially no previous edge in the same level list
         this.next_v = null; // initially no next edge in the same level list
         this.next_v = null; // initially no next edge at the next level
