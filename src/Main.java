@@ -125,12 +125,12 @@ public class Main {
 
         // System.out.println("Randomint "+rand.nextInt() + " "+rand2.nextInt());
         // System.out.println("Randomint "+rand.nextInt() + " "+rand2.nextInt());
-        // double start = System.currentTimeMillis();
-        // CouplingPast cp1 = new CouplingPast(1, 1000 , 1.5/1000, 2);
+        double start = System.currentTimeMillis();
+        CouplingPast cp1 = new CouplingPast(1000*1000, 1000 , 0.0015, 2);
         
-        // cp1.couple();
-        // double end = System.currentTimeMillis();
-        // System.out.println("Time taken: " + (end - start) + " ms");
+        cp1.couple();
+        double end = System.currentTimeMillis();
+        System.out.println("Time taken: " + (end - start) + " ms");
         // System.out.println();
         // start = System.currentTimeMillis();
         // GlauberCoupling cp2 = new GlauberCoupling(1, 1000 , 1.5/1000, 2);
@@ -142,8 +142,8 @@ public class Main {
          
 
 
-        test_dyn test = new test_dyn(1000, 100000);
-        System.out.println(test.test());
+        // test_dyn test = new test_dyn(1000, 10000);
+        // System.out.println(test.test());
 
 
 
