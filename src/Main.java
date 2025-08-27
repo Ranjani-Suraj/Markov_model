@@ -125,13 +125,14 @@ public class Main {
 
         // System.out.println("Randomint "+rand.nextInt() + " "+rand2.nextInt());
         // System.out.println("Randomint "+rand.nextInt() + " "+rand2.nextInt());
-        double start = System.currentTimeMillis();
+
+        long start = System.nanoTime();
         CouplingPast cp1 = new CouplingPast(1000*1000, 1000 , 0.0015, 2);
-        
         cp1.couple();
-        double end = System.currentTimeMillis();
-        System.out.println("Time taken: " + (end - start) + " ms");
-        // System.out.println();
+        long end = System.nanoTime();
+        System.out.println("Time taken: " + (end - start) + " ns");
+        System.out.println();
+
         // start = System.currentTimeMillis();
         // GlauberCoupling cp2 = new GlauberCoupling(1, 1000 , 1.5/1000, 2);
         
@@ -168,17 +169,17 @@ public class Main {
         
         // for(int i = 0; i < iters; i++){
         //     int ch = Math.abs((int)(Math.random()*p_choices.length));
-        //     System.out.println("n = "+n+", epochs = 100, p = "+p_choices[ch] + " q = 2");
-        //     GlauberCoupling cp = new GlauberCoupling(100, n, p_choices[ch], 2);
-        //     long start = System.nanoTime();
+        //     System.out.println("n = "+n+", epochs = "+n*n+", p = "+p_choices[ch] + " q = 2");
+        //     CouplingPast cp = new CouplingPast(n*n, n, p_choices[ch], 2);
+        //     long start1 = System.nanoTime();
         //     double[] output = cp.couple(); //largest component, iterations
-        //     long end = System.nanoTime();
-        //     times[i] = end-start;
+        //     long end1 = System.nanoTime();
+        //     times[i] = end1-start1;
         //     results.putIfAbsent(p_choices[ch], new ArrayList<>());
         //     results.get(p_choices[ch]).add(output);
         //     System.out.println("Run "+i+"took "+times[i]+" nanoseconds, "+output[1]+" iterations, and gave largest cc "+output[0]+" for p = "+p_choices[ch]);
         // }
-
+        // //results: {p, {largest comp, iterations}}
         // double avg_time = 0.0, avg_size = 0.0, avg_overall_time = 0.0;
         // for(int i = 0; i<p_choices.length; i++){
         //     double t_c[] = new double[2] ;
@@ -196,62 +197,5 @@ public class Main {
         //     avg_size = 0.0; avg_time = 0.0;
         // }
         // System.out.println("Average overall time: "+avg_overall_time/iters);
-
-
-        // System.out.println(results);
-
-
-        // System.out.printf("\nHello and welcome!");
-
-        // // Press Shift+F10 or click the green arrow button in the gutter to run the code.
-        // for (int i = 1; i <= 5; i++) {
-
-        //     // Press Shift+F9 to start debugging your code. We have set one breakpoint
-        //     // for you, but you can always add more by pressing Ctrl+F8.
-        //     System.out.println("i = " + i);
-        // }
     }
-
-//     public static void tests(){
-//         Node a = new Node(1);
-//         Node b = new Node(2);
-// //         b.parent = a;
-// //         a.left = b;
-// //         a.adjacent_nodes[1] = 1;
-// //         b.adjacent_nodes[1] = 1;
-
-// //         b.update();
-// //         a.update();
-// // //idk if we even need the number of nodes that have extra nodes as long as like. One of them does?        
-//          Node c = new Node(3);
-// //         c.parent = a;
-// //         a.right = c;
-        
-// //         a.update();
-// //         c.update();
-// //         Bst btree = new Bst();
-// //         // Bst.insert_node(a);
-// //         // Bst.insert_node(b);
-// //         // Bst.insert_node(c);
-        
-// //         Bst.print_bst(a);
-// //         System.out.println();
-// //         System.out.println("size:"+(a.size_subtree)+" sum adj: non tree, tree: "+a.sum_adjacent_nodes[0]+" "+a.sum_adjacent_nodes[1]+
-// //         "\nadj: "+a.adjacent_nodes[0] + " "+a.adjacent_nodes[1]);
-
-//         ET_tour et = new ET_tour();
-//         et.add_node(1, a);
-//         et.add_node(2, b);
-//         et.add_node(3, c);
-
-//         et.link(1, 2);
-//         et.print_tour(a.name);
-//         et.link(3, 1);
-       
-        
-//         et.print_tour(a.name);
-//         System.out.println("size:"+(a.size_subtree)+" sum adj: non tree, tree: "+a.sum_adjacent_nodes[0]+" "+a.sum_adjacent_nodes[1]+
-//         "\nadj: "+a.adjacent_nodes[0] + " "+a.adjacent_nodes[1]);
-
-//     }
 }

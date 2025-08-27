@@ -15,7 +15,7 @@ public class test_dyn {
         dyn_vertices = new ArrayList<>(n);
     }
 
-
+    
     Set<Integer> explore(int start){
         Set<Integer> visited = new HashSet<>();
         ArrayList<Integer> stack = new ArrayList<>();
