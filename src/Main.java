@@ -108,11 +108,11 @@ public class Main {
         for(int _n = 0; _n < graph_sizes.length; _n++){
             n = graph_sizes[_n];
             if (final_results.containsKey(n)){
-                System.out.print("For n = "+n);
+                System.out.print("For n = "+n+"-----------------------\n");
                 for(int _q = 0; _q < q_options.length; _q++){
                     int q = q_options[_q];
                     if (final_results.get(n).containsKey(q)){
-                        System.out.println(" For q = "+q);
+                        System.out.println(" For q = "+q+"------------------------\n");
                         for(int i = 0; i<p_choices.length; i++){
                             //double avg_time = final_results.get(n).get(q).get(p_choices[i])
                             int size = 0;
