@@ -49,7 +49,7 @@ public class Main {
         //obv size isnt working which is a thing in and of itself  
 
 
-        int iters = 1000;
+        int iters = 4000;
         Map<Double, ArrayList<double[]>> results = new HashMap<>();
         long[] times = new long[iters];
         Random random = new Random();
@@ -60,15 +60,15 @@ public class Main {
             p_choices[i] = p_choices[i-1] + 0.1/n;
 
         }
-        int[] graph_sizes = {1000, 10000, 5000, 7500, 2500, 500, 100000};
+        int[] graph_sizes = {1000, 2500, 500};
         int[] q_options = {1, 2};
         Map<Integer, Map<Integer, Map<Double, ArrayList<double[]>>>> final_results = new HashMap<>();
         // {n, {q, {p, {largest comp, time}}}}
         for(int i = 0; i < iters; i++){
             int ch = Math.abs((int)(Math.random()*p_choices.length));
-            int n_index = random.nextInt(7);
+            int n_index = random.nextInt(graph_sizes.length);
             n = graph_sizes[n_index];
-            int q_index = (int)(Math.round(random.nextDouble()));
+            int q_index = (int)((random.nextInt(2)));
             int q = q_options[q_index];
             //int q = 2;
             if (final_results.containsKey(n)){ //if n has not been hit yet
