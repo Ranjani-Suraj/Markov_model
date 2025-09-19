@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class Dfs {
-    Map<Integer, Set<Integer>> graph = new HashMap<>();
+    public Map<Integer, Set<Integer>> graph = new HashMap<>();
     int n;
     int cycles;
     
@@ -29,9 +29,9 @@ public class Dfs {
         graph.get(v).remove(u);
     }
 
-    public void connected(int u, int v){
+    public boolean connected(int u, int v){
         Set<Integer> cc_u = explore(u);
-        System.out.println(cc_u.contains(v));
+        return cc_u.contains(v);
     }
 
     public Set<Integer> explore(int start){
@@ -79,5 +79,16 @@ public class Dfs {
                 }
             }
         }
+    }
+
+    public int max_cc(){
+        int max_size = 0;
+        for(int i = 0; i < n; i++){
+            Set<Integer> cc = explore(i);
+            if(cc.size() > max_size){
+                max_size = cc.size();
+            }
+        }
+        return max_size;
     }
 }

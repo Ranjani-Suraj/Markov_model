@@ -2,11 +2,18 @@ package markov_funcs;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Set;
+
 import Dynamic_Graph.ConnGraph;
 import Dynamic_Graph.ConnVertex;
 import Vanilla_dfs.Dfs;
 //import dyn_connectivity.*;
 
+//stress test for all values of n, p, 1<=q<=2
+//check why the time behaviour is weird
+//test without time checks
+
+//
 
 
 public class CouplingPast {
@@ -32,16 +39,19 @@ public class CouplingPast {
         this.n = n;
         this.g1 = new ConnGraph();
         this.g2 = new ConnGraph();
+        this.vg1 = new Dfs(n);
+        this.vg2 = new Dfs(n);
         this.p = p;
         this.q = q;
         this.pi = p/(p+q*(1-p));
-        Random r = new Random(50); //works for 50, does not work for 42
+        Random r = new Random(); 
         seeds = new ArrayList<Integer>();
         //make g1 a complete graph
         //make g2 an empty graph
         for (int i = 0; i<n; i++){
             vertices.add(new ConnVertex());
-            
+            // vg1.add_vertex(i);
+            // vg2.add_vertex(i);
             //System.out.println("Added vertex " + i + "-> " + vertices.get(i));
             
         }
@@ -57,7 +67,9 @@ public class CouplingPast {
                     //add_time += (System.nanoTime() - start);
             }
         }
-        //edges1/=2; //each edge was added twice
+
+        //edges1*=0.8; //each edge was added twice
+
         System.out.println("Initial edges in g1: "+edges1);
         //edges1 = n * (n - 1) / 2; //complete graph has n(n-1)/2 edges
         edges2 = 0; //empty graph has 0 edges
@@ -151,18 +163,18 @@ public class CouplingPast {
                 //System.out.println("edge is a tree edge in g1");
                 if(replace1){
                     //System.out.println("edge is in g1");
-                    start = System.nanoTime();
+                    //start = System.nanoTime();
                     g1.removeEdge(u, v);
-                    del_time += (System.nanoTime() - start);
+                    //del_time += (System.nanoTime() - start);
                     num_del += 1;
                 }
                 
                 
                 //if they are not connected, then removing the edge
                 //splits the cc so it IS a cut edge
-                start = System.nanoTime();
+                //start = System.nanoTime();
                 boolean connected = g1.connected(u, v);
-                conn_time += (System.nanoTime() - start);
+                //conn_time += (System.nanoTime() - start);
                 num_conn += 1;
                 if(!connected){
                     //edge is not a cut edge, so we can add it to g2
@@ -175,9 +187,9 @@ public class CouplingPast {
                 }
                 if(replace1){
                     //System.out.println("adding edge back to g1 "+edge[0]  + " " + edge[1]);
-                    start = System.nanoTime();
+                    //start = System.nanoTime();
                     g1.addEdge(u, v); //add it back
-                    add_time += (System.nanoTime() - start);
+                    //add_time += (System.nanoTime() - start);
                     num_add += 1;
                 }
             }
@@ -187,9 +199,9 @@ public class CouplingPast {
             }
             else{
                 //it is not in the graph, but we need to check if they are alr connected
-                start = System.nanoTime();
+                //start = System.nanoTime();
                 boolean connected = g1.connected(u, v);
-                conn_time += (System.nanoTime() - start);
+                //conn_time += (System.nanoTime() - start);
                 num_conn += 1;
                 //System.out.println("nodes u: "+edge[0]+" and v: "+edge[1]+" are "+connected);
                 cut_edge1 = !connected;
@@ -199,18 +211,18 @@ public class CouplingPast {
                 //System.out.println("edge is a tree edge in g1");
                 if(replace2){
                     //System.out.println("edge is in g1");
-                    start = System.nanoTime();
+                    //start = System.nanoTime();
                     g2.removeEdge(u, v);
-                    del_time += (System.nanoTime() - start);
+                    //del_time += (System.nanoTime() - start);
                     num_del += 1;                
                 }
                 
                 
                 //if they are not connected, then removing the edge
                 //splits the cc so it IS a cut edge
-                start = System.nanoTime();
+                //start = System.nanoTime();
                 boolean connected = g2.connected(u, v);
-                conn_time += (System.nanoTime() - start);
+                //conn_time += (System.nanoTime() - start);
                 num_conn += 1;
                 if(!connected){
                     //edge is not a cut edge, so we can add it to g2
@@ -223,9 +235,9 @@ public class CouplingPast {
                 }
                 if(replace2){
                     //System.out.println("adding edge back to g1 "+edge[0]  + " " + edge[1]);
-                    start = System.nanoTime();
+                    //start = System.nanoTime();
                     g2.addEdge(u, v); //add it back
-                    add_time += (System.nanoTime() - start);
+                    //add_time += (System.nanoTime() - start);
                     num_add += 1;
                 }
             }
@@ -235,34 +247,14 @@ public class CouplingPast {
             }
             else{
                 //it is not in the graph, but we need to check if they are alr connected
-                start = System.nanoTime();
+                //start = System.nanoTime();
                 boolean connected = g2.connected(u, v);
-                conn_time += (System.nanoTime() - start);
+                //conn_time += (System.nanoTime() - start);
                 num_conn += 1;
                 //System.out.println("nodes u: "+edge[0]+" and v: "+edge[1]+" are "+connected);
                 cut_edge2 = !connected;
             }
             
-            
-
-            //System.out.println("starting g2 now");
-
-            // boolean replace2 = g2.hasEdge(u, v);
-            // //it says the edge does not exist which is so confusing
-            // if(replace2)                {
-            //     g2.removeEdge(u, v);
-            // }
-            // if(!g2.connected(u, v)){
-            //     //edge is not a cut edge, so we can add it to g2
-            //     //System.out.println("edge is a cut edge for g2");
-            //     cut_edge2 = true;
-            // }
-            // if(replace2){
-            //     double start = System.nanoTime();
-            //     g2.addEdge(u, v); //add it back
-            //     add_time += (System.nanoTime() - start);
-            // }
-
             ////System.out.println("starting to add/delete!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
             //need to do the markov stuff lol i forgor
             //need to keep track of number of edges whoops
@@ -271,9 +263,9 @@ public class CouplingPast {
                 if(r <= pi){ //we add it if it is a cut edge w probability pi
                     if(!g1.hasEdge(u, v)){
                         edges1++;
-                        start = System.nanoTime();
+                        //start = System.nanoTime();
                         g1.addEdge(u, v); 
-                        add_time += (System.nanoTime() - start);
+                        //add_time += (System.nanoTime() - start);
                         num_add += 1;
                         //System.out.println("added edge to g1 "+edge[0]  + " " + edge[1]+ "------------------------152");
                     }
@@ -282,9 +274,9 @@ public class CouplingPast {
                 else{
                     //remove it 
                     if(g1.hasEdge(u, v)){
-                        start = System.nanoTime();
+                        //start = System.nanoTime();
                         g1.removeEdge(u, v);
-                        del_time += (System.nanoTime() - start);
+                        //del_time += (System.nanoTime() - start);
                         num_del += 1;
                         edges1--;
                         //System.out.println("deleted edge to g1 "+edge[0]  + " " + edge[1]+ "------------------------161");
@@ -295,9 +287,9 @@ public class CouplingPast {
                 ////System.out.println("not cut edge for g1 "+edge[0]  + " " + edge[1]+ ", r = " + r + " p = " + p);
                 if(!g1.hasEdge(u, v)){
                     edges1++;
-                    start = System.nanoTime();
+                    //start = System.nanoTime();
                     g1.addEdge(u, v);
-                    add_time += (System.nanoTime() - start);
+                    //add_time += (System.nanoTime() - start);
                     num_add += 1;
                     //System.out.println("added edge to g1 "+edge[0]  + " " + edge[1]+ "------------------------169");
                 }
@@ -305,9 +297,9 @@ public class CouplingPast {
             else{ //we remove it
                 ////System.out.println("not cut edge for g1 "+edge[0]  + " " + edge[1]+ ", r = " + r + " p = " + p);
                 if(g1.hasEdge(u, v)){
-                    start = System.nanoTime();
+                    //start = System.nanoTime();
                     g1.removeEdge(u, v);
-                    del_time += (System.nanoTime() - start);
+                    //del_time += (System.nanoTime() - start);
                     num_del += 1;
                     edges1--;
                     //System.out.println("deleted edge to g1 "+edge[0]  + " " + edge[1]+ "------------------------176");
@@ -320,10 +312,10 @@ public class CouplingPast {
                 if(r <= pi){ //we add it if it is a cut edge w probability pi
                     if(!g2.hasEdge(u, v)){
                         edges2++;
-                        start = System.nanoTime();
+                        //start = System.nanoTime();
                         g2.addEdge(u, v); 
                         num_add += 1;
-                        add_time += (System.nanoTime() - start);
+                        //add_time += (System.nanoTime() - start);
                         //System.out.println("added edge to g2 "+edge[0]  + " " + edge[1]+ "------------------------185");
                     }
                     //else //System.out.println("already in g2 "+edge[0]  + " " + edge[1]+ "------------------------187");
@@ -332,9 +324,9 @@ public class CouplingPast {
                 else{
                     //remove it 
                     if(g2.hasEdge(u, v)){
-                        start = System.nanoTime();
+                        //start = System.nanoTime();
                         g2.removeEdge(u, v);
-                        del_time += (System.nanoTime() - start);
+                        //del_time += (System.nanoTime() - start);
                         num_del += 1;
                         edges2--;
                         //System.out.println("deleted edge to g2 "+edge[0]  + " " + edge[1]+ "------------------------194");
@@ -345,9 +337,9 @@ public class CouplingPast {
             else if(r <= p){ //we still add it if its not a cut edge w prob p
                 if(!g2.hasEdge(u, v)){
                     edges2++;
-                    start = System.nanoTime();
+                    //start = System.nanoTime();
                     g2.addEdge(u, v);
-                    add_time += (System.nanoTime() - start);
+                    //add_time += (System.nanoTime() - start);
                     num_add += 1;
                     //System.out.println("added edge to g2 "+edge[0]  + " " + edge[1] + "------------------------203");
 
@@ -355,9 +347,9 @@ public class CouplingPast {
             }
             else{ //we remove it
                 if(g2.hasEdge(u, v)){
-                    start = System.nanoTime();
+                    //start = System.nanoTime();
                     g2.removeEdge(u, v);
-                    del_time += (System.nanoTime() - start);
+                    //del_time += (System.nanoTime() - start);
                     num_del += 1;
                     edges2--;
                     //System.out.println("deleted edge to g2 "+edge[0]  + " " + edge[1]+ "------------------------211");
@@ -387,6 +379,11 @@ public class CouplingPast {
         //if r<pi and p then ig we def add for both, if r>p and pi then we def remove for both? i guess?
         Random random = new Random(seed);
         //System.out.println("edges: "+edges+" rs"+r_s);
+        ArrayList<Set<Integer>> cc1 = new ArrayList<>();
+        ArrayList<Set<Integer>> cc2 = new ArrayList<>();
+        Set<Integer> comp = vg1.explore(i);
+        cc1.add(comp);
+        
         for (i = 0; i<epochs; i++){
             //need to store the seeds and access them as needed
             //seed 0 will be used for original epoch size. seed 1 will be for orig epoch * 2, etc.
@@ -422,141 +419,59 @@ public class CouplingPast {
             }
             r_used[i] = r;
             t++;
-            ConnVertex u = vertices.get(edge[0]);
-            ConnVertex v = vertices.get(edge[1]);
+            // ConnVertex u = vertices.get(edge[0]);
+            // ConnVertex v = vertices.get(edge[1]);
+
+            int u = edge[0], v = edge[1];
+
             //need to check if edge is a cut edge. This means we remove edge, if it is still connected, then it is not.
             
             //if it is not a tree edge and is in the graph, then it is def not a cut edge
-            boolean replace1 = g1.hasEdge(u, v), replace2 = g2.hasEdge(u, v);
+            //boolean replace1 = g1.hasEdge(u, v), replace2 = g2.hasEdge(u, v);
+
+            boolean replace1 = vg1.graph.get(edge[0]).contains(edge[1]), replace2 = vg2.graph.get(edge[0]).contains(edge[1]);
+
             //do i need to actually delete and replace it. Maybe i can just see if i find a replacement?
             //code to find a replacement exists, maybe I dublicate it to see if it returns soemthing?
             boolean cut_edge1 = false, cut_edge2 = false;
-            if(g1.is_tree_edge(u, v)){
-                //System.out.println("edge is a tree edge in g1");
-                if(replace1){
-                    //System.out.println("edge is in g1");
-                    start = System.nanoTime();
-                    g1.removeEdge(u, v);
-                    del_time += (System.nanoTime() - start);
-                    num_del += 1;
-                }
-                
-                
-                //if they are not connected, then removing the edge
-                //splits the cc so it IS a cut edge
-                start = System.nanoTime();
-                boolean connected = g1.connected(u, v);
-                conn_time += (System.nanoTime() - start);
-                num_conn += 1;
-                if(!connected){
-                    //edge is not a cut edge, so we can add it to g2
-                    ////System.out.println("edge is a cut edge for g1");
+            
+            if(replace1){
+                vg1.removeEdge(u, v);
+                boolean connected = vg1.connected(u, v);
+                if(!connected) 
                     cut_edge1 = true;
-                }
-                else{
-                    ////System.out.println("edge is not a cut edge for g1");
+                else 
                     cut_edge1 = false;
-                }
-                if(replace1){
-                    //System.out.println("adding edge back to g1 "+edge[0]  + " " + edge[1]);
-                    start = System.nanoTime();
-                    g1.addEdge(u, v); //add it back
-                    add_time += (System.nanoTime() - start);
-                    num_add += 1;
-                }
-            }
-            else if (replace1){
-                cut_edge1 = false;
-                //System.out.println("edge is not a tree edge in g1 but it is IN g1 so it cannot be a cut edge");
+                vg1.addEdge(u, v);
             }
             else{
-                //it is not in the graph, but we need to check if they are alr connected
-                start = System.nanoTime();
-                boolean connected = g1.connected(u, v);
-                conn_time += (System.nanoTime() - start);
-                num_conn += 1;
-                //System.out.println("nodes u: "+edge[0]+" and v: "+edge[1]+" are "+connected);
+                boolean connected = vg1.connected(u, v);
                 cut_edge1 = !connected;
             }
 
-            if(g2.is_tree_edge(u, v)){
-                //System.out.println("edge is a tree edge in g1");
-                if(replace2){
-                    //System.out.println("edge is in g1");
-                    start = System.nanoTime();
-                    g2.removeEdge(u, v);
-                    del_time += (System.nanoTime() - start);
-                    num_del += 1;                
-                }
-                
-                
-                //if they are not connected, then removing the edge
-                //splits the cc so it IS a cut edge
-                start = System.nanoTime();
-                boolean connected = g2.connected(u, v);
-                conn_time += (System.nanoTime() - start);
-                num_conn += 1;
-                if(!connected){
-                    //edge is not a cut edge, so we can add it to g2
-                    ////System.out.println("edge is a cut edge for g1");
+            if(replace2){
+                vg2.removeEdge(u, v);
+                boolean connected = vg2.connected(u, v);
+                if(!connected) 
                     cut_edge2 = true;
-                }
-                else{
-                    ////System.out.println("edge is not a cut edge for g1");
+                else 
                     cut_edge2 = false;
-                }
-                if(replace2){
-                    //System.out.println("adding edge back to g1 "+edge[0]  + " " + edge[1]);
-                    start = System.nanoTime();
-                    g2.addEdge(u, v); //add it back
-                    add_time += (System.nanoTime() - start);
-                    num_add += 1;
-                }
-            }
-            else if (replace2){
-                cut_edge2 = false;
-                //System.out.println("edge is not a tree edge in g1 but it is IN g1 so it cannot be a cut edge");
+                vg2.addEdge(u, v);
             }
             else{
-                //it is not in the graph, but we need to check if they are alr connected
-                start = System.nanoTime();
-                boolean connected = g2.connected(u, v);
-                conn_time += (System.nanoTime() - start);
-                num_conn += 1;
-                //System.out.println("nodes u: "+edge[0]+" and v: "+edge[1]+" are "+connected);
+                boolean connected = vg2.connected(u, v);
                 cut_edge2 = !connected;
             }
             
             
-
-            //System.out.println("starting g2 now");
-
-            // boolean replace2 = g2.hasEdge(u, v);
-            // //it says the edge does not exist which is so confusing
-            // if(replace2)                {
-            //     g2.removeEdge(u, v);
-            // }
-            // if(!g2.connected(u, v)){
-            //     //edge is not a cut edge, so we can add it to g2
-            //     //System.out.println("edge is a cut edge for g2");
-            //     cut_edge2 = true;
-            // }
-            // if(replace2){
-            //     double start = System.nanoTime();
-            //     g2.addEdge(u, v); //add it back
-            //     add_time += (System.nanoTime() - start);
-            // }
-
-            ////System.out.println("starting to add/delete!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
-            //need to do the markov stuff lol i forgor
-            //need to keep track of number of edges whoops
             if(cut_edge1){
                 //System.out.println("cut edge for g1 "+edge[0]  + " " + edge[1]+ ", r = " + r + " pi = " + pi);
                 if(r <= pi){ //we add it if it is a cut edge w probability pi
-                    if(!g1.hasEdge(u, v)){
+                   
+                    if(!vg1.graph.get(u).contains(v)){
                         edges1++;
                         start = System.nanoTime();
-                        g1.addEdge(u, v); 
+                        vg1.addEdge(u, v); 
                         add_time += (System.nanoTime() - start);
                         num_add += 1;
                         //System.out.println("added edge to g1 "+edge[0]  + " " + edge[1]+ "------------------------152");
@@ -564,10 +479,10 @@ public class CouplingPast {
                     //dont need to mess with teh cc stuff since thats all handled
                 }
                 else{
-                    //remove it 
-                    if(g1.hasEdge(u, v)){
+   
+                    if(vg1.graph.get(u).contains(v)){
                         start = System.nanoTime();
-                        g1.removeEdge(u, v);
+                        vg1.removeEdge(u, v);
                         del_time += (System.nanoTime() - start);
                         num_del += 1;
                         edges1--;
@@ -576,21 +491,21 @@ public class CouplingPast {
                 }
             }
             else if(r <= p){ //we still add it if its not a cut edge w prob p
-                ////System.out.println("not cut edge for g1 "+edge[0]  + " " + edge[1]+ ", r = " + r + " p = " + p);
-                if(!g1.hasEdge(u, v)){
+              
+                if(!vg1.graph.get(u).contains(v)){
                     edges1++;
                     start = System.nanoTime();
-                    g1.addEdge(u, v);
+                    vg1.addEdge(u, v);
                     add_time += (System.nanoTime() - start);
                     num_add += 1;
                     //System.out.println("added edge to g1 "+edge[0]  + " " + edge[1]+ "------------------------169");
                 }
             }
             else{ //we remove it
-                ////System.out.println("not cut edge for g1 "+edge[0]  + " " + edge[1]+ ", r = " + r + " p = " + p);
-                if(g1.hasEdge(u, v)){
+               
+                if(vg1.graph.get(u).contains(v)){
                     start = System.nanoTime();
-                    g1.removeEdge(u, v);
+                    vg1.removeEdge(u, v);
                     del_time += (System.nanoTime() - start);
                     num_del += 1;
                     edges1--;
@@ -602,10 +517,11 @@ public class CouplingPast {
                 //System.out.println("cut edge for g2 "+edge[0]  + " " + edge[1]+ ", r = " + r + " pi = " + pi);
 
                 if(r <= pi){ //we add it if it is a cut edge w probability pi
-                    if(!g2.hasEdge(u, v)){
+
+                    if(!vg2.graph.get(u).contains(v)){
                         edges2++;
                         start = System.nanoTime();
-                        g2.addEdge(u, v); 
+                        vg2.addEdge(u, v); 
                         num_add += 1;
                         add_time += (System.nanoTime() - start);
                         //System.out.println("added edge to g2 "+edge[0]  + " " + edge[1]+ "------------------------185");
@@ -615,9 +531,10 @@ public class CouplingPast {
                 }
                 else{
                     //remove it 
-                    if(g2.hasEdge(u, v)){
+
+                    if(vg2.graph.get(u).contains(v)){
                         start = System.nanoTime();
-                        g2.removeEdge(u, v);
+                        vg2.removeEdge(u, v);
                         del_time += (System.nanoTime() - start);
                         num_del += 1;
                         edges2--;
@@ -627,10 +544,12 @@ public class CouplingPast {
                 }
             }
             else if(r <= p){ //we still add it if its not a cut edge w prob p
-                if(!g2.hasEdge(u, v)){
+  
+                // }
+                if(!vg2.graph.get(u).contains(v)){
                     edges2++;
                     start = System.nanoTime();
-                    g2.addEdge(u, v);
+                    vg2.addEdge(u, v);
                     add_time += (System.nanoTime() - start);
                     num_add += 1;
                     //System.out.println("added edge to g2 "+edge[0]  + " " + edge[1] + "------------------------203");
@@ -638,9 +557,10 @@ public class CouplingPast {
                 }
             }
             else{ //we remove it
-                if(g2.hasEdge(u, v)){
+
+                if(vg2.graph.get(u).contains(v)){
                     start = System.nanoTime();
-                    g2.removeEdge(u, v);
+                    vg2.removeEdge(u, v);
                     del_time += (System.nanoTime() - start);
                     num_del += 1;
                     edges2--;
@@ -655,6 +575,7 @@ public class CouplingPast {
         this.iterations+=t;
         return false;
     }
+
 
     public double[] couple(){
         int num = 1;
@@ -696,12 +617,12 @@ public class CouplingPast {
         //     }
         // }
         
-        System.out.println("edges: "+edges1+" "+edges2+" iterations: "+iterations);
-        System.out.println("Average add time: "+(add_time/num_add)+" ns over "+num_add+" operations");
-        System.out.println("Average del time: "+(del_time/num_del)+" ns over "+num_del+" operations");
-        System.out.println("Average conn time: "+(conn_time/num_conn)+" ns over "+num_conn+" operations");
-        int largest_component = g1.max_comp_size();
-        System.out.println("Largest component size: "+largest_component+" out of "+n);
+        // System.out.println("edges: "+edges1+" "+edges2+" iterations: "+iterations);
+        // System.out.println("Average add time: "+(add_time/num_add)+" ns over "+num_add+" operations");
+        // System.out.println("Average del time: "+(del_time/num_del)+" ns over "+num_del+" operations");
+        // System.out.println("Average conn time: "+(conn_time/num_conn)+" ns over "+num_conn+" operations");
+         int largest_component = g1.max_comp_size();
+        // System.out.println("Largest component size: "+largest_component+" out of "+n);
         // int size_res  = g1.max_cc();
         // if(size_res != largest_component){
         //     //System.out.println(" dfs: "+largest_component+" size: "+size_res);
