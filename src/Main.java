@@ -3,7 +3,7 @@
 //import Dynamic_Graph.*;
 import markov_funcs.GlauberCoupling;
 import markov_funcs.CouplingPast;
-import java.util.Random;
+
 //import com.dyn_connect;
 //import java.sql.Time;
 import java.util.*;
@@ -49,7 +49,7 @@ public class Main {
         //obv size isnt working which is a thing in and of itself  
 
 
-        int iters = 100;
+        int iters = 1000;
         Map<Double, ArrayList<double[]>> results = new HashMap<>();
         long[] times = new long[iters];
         Random random = new Random();
@@ -60,15 +60,34 @@ public class Main {
             p_choices[i] = p_choices[i-1] + 0.1/n;
 
         }
-        int[] graph_sizes = {1000, 10000, 5000, 7500, 2500, 500, 750};
+        int[] graph_sizes = {1000, 10000, 5000, 7500, 2500, 500, 100000};
         int[] q_options = {1, 2};
+        Map<Integer, Map<Integer, Map<Double, ArrayList<double[]>>>> final_results = new HashMap<>();
+        // {n, {q, {p, {largest comp, time}}}}
         for(int i = 0; i < iters; i++){
             int ch = Math.abs((int)(Math.random()*p_choices.length));
             int n_index = random.nextInt(7);
-            //n = graph_sizes[n_index];
-            // int q_index = (int)(Math.round(random.nextDouble()));
-            // int q = q_options[q_index];
-            int q = 2;
+            n = graph_sizes[n_index];
+            int q_index = (int)(Math.round(random.nextDouble()));
+            int q = q_options[q_index];
+            //int q = 2;
+            if (final_results.containsKey(n)){ //if n has not been hit yet
+                if (final_results.get(n).containsKey(q)){ //if this q fro this n has not been hit yet
+                    if (!final_results.get(n).get(q).containsKey(p_choices[ch])){ //if this p for this q for this n has not been hit yet
+                        final_results.get(n).get(q).put(p_choices[ch], new ArrayList<>());
+                    }
+                    //if this p exists, then we do nothing
+                    
+                } 
+                else {
+                    final_results.get(n).put(q, new HashMap<>());
+                    final_results.get(n).get(q).put(p_choices[ch], new ArrayList<>());
+                }
+            } else {
+                final_results.put(n, new HashMap<>());
+                final_results.get(n).put(q, new HashMap<>());
+                final_results.get(n).get(q).put(p_choices[ch], new ArrayList<>());
+            }
             System.out.println("n = "+n+", epochs = "+n*n+", p = "+p_choices[ch] + " q = "+q);
             long start1 = System.nanoTime();
             CouplingPast cp = new CouplingPast(n*n, n, p_choices[ch], q);
@@ -79,26 +98,61 @@ public class Main {
             output[1] = times[i];
             results.putIfAbsent(p_choices[ch], new ArrayList<>());
             results.get(p_choices[ch]).add(output);
+            final_results.get(n).get(q).get(p_choices[ch]).add(output);
             System.out.println("Run "+i+"took "+times[i]+" nanoseconds, "+output[1]+" iterations, and gave largest cc "+output[0]+" for p = "+p_choices[ch]);
         }
         //results: {p, {largest comp, iterations}}
         double avg_time = 0.0, avg_size = 0.0, avg_overall_time = 0.0;
         int index = 0;
-        for(int i = 0; i<p_choices.length; i++){
-            
-            double t_c[] = new double[2] ;
-            int size = results.get(p_choices[i]).size();
-            for(int j = 0; j< size; j++){
-                t_c = results.get(p_choices[i]).get(j);
-                //System.out.println(""+p_choices[i]+" "+t_c[0]+ " ");
-                avg_size+=t_c[0];
-                avg_time += t_c[1];
-                avg_overall_time += t_c[1];
+        
+        for(int _n = 0; _n < graph_sizes.length; _n++){
+            n = graph_sizes[_n];
+            if (final_results.containsKey(n)){
+                System.out.print("For n = "+n);
+                for(int _q = 0; _q < q_options.length; _q++){
+                    int q = q_options[_q];
+                    if (final_results.get(n).containsKey(q)){
+                        System.out.println(" For q = "+q);
+                        for(int i = 0; i<p_choices.length; i++){
+                            //double avg_time = final_results.get(n).get(q).get(p_choices[i])
+                            int size = 0;
+                            avg_size = 0.0; avg_time = 0.0;
+                            int index2 = 0;
+                            if (final_results.get(n).get(q).containsKey(p_choices[i])){
+                                for(index2 = 0; index2 < final_results.get(n).get(q).get(p_choices[i]).size(); index2++){
+                                    double t_c[] = new double[2] ;
+                                    size = final_results.get(n).get(q).get(p_choices[i]).size();
+                                    t_c = final_results.get(n).get(q).get(p_choices[i]).get(index2);
+                                    //index2 ++;
+                                    //System.out.println(""+p_choices[i]+" "+t_c[0]+ " ");
+                                    avg_size += t_c[0];
+                                    avg_time += t_c[1];
+                                    avg_overall_time += t_c[1];
+                                }
+                            }
+                            
+                            System.out.println("  for p = "+p_choices[i]+" , time "+avg_time/size+" avg size "+avg_size/size+" \\");
+                        }
+                    }
+                }
             }
-            avg_size/=size; avg_time/=size;
-            System.out.println("for p = "+p_choices[i]+" , avg time "+avg_time+" avg size "+avg_size+" \\");
-            avg_size = 0.0; avg_time = 0.0;
         }
+        // for(int i = 0; i<p_choices.length; i++){
+            
+        //     double t_c[] = new double[2] ;
+        //     int size = results.get(p_choices[i]).size();
+        //     for(int j = 0; j< size; j++){
+        //         ArrayList<double[]> t = results.get(p_choices[i]);
+        //         t_c = t.get(j);
+        //         //System.out.println(""+p_choices[i]+" "+t_c[0]+ " ");
+        //         avg_size+=t_c[0];
+        //         avg_time += t_c[1];
+        //         avg_overall_time += t_c[1];
+        //     }
+        //     avg_size/=size; avg_time/=size;
+        //     System.out.println("for p = "+p_choices[i]+" , avg time "+avg_time+" avg size "+avg_size+" \\");
+        //     avg_size = 0.0; avg_time = 0.0;
+        // }
         System.out.println("Average overall time: "+avg_overall_time/iters);
     }
 }
