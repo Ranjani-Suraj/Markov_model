@@ -121,6 +121,9 @@ public class CouplingPast {
             //double r = r_s.get(i);
             if(i >= sub_epoch_size){
                 seed_index++;
+                if(seed_index >= seeds.size()){
+                    seeds.add((int)(random.nextInt()));
+                }
                 seed = seeds.get(seed_index);
                 sub_epoch_size += original_epochs*(int)(base/2);
                 base/=2;

@@ -95,11 +95,12 @@ public class Main {
             
             long end1 = System.nanoTime();
             times[i] = end1-start1;
+            
+            System.out.println("Run "+i+"took "+times[i]+" nanoseconds, "+output[1]+" iterations, and gave largest cc "+output[0]+" for p = "+p_choices[ch]);
             output[1] = times[i];
             results.putIfAbsent(p_choices[ch], new ArrayList<>());
             results.get(p_choices[ch]).add(output);
             final_results.get(n).get(q).get(p_choices[ch]).add(output);
-            System.out.println("Run "+i+"took "+times[i]+" nanoseconds, "+output[1]+" iterations, and gave largest cc "+output[0]+" for p = "+p_choices[ch]);
         }
         //results: {p, {largest comp, iterations}}
         double avg_time = 0.0, avg_size = 0.0, avg_overall_time = 0.0;
